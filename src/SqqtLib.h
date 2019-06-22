@@ -49,7 +49,6 @@ class Topic{
 	std::vector <Client *> clients;
 public:
 	Topicid _id;
-	Msg _msg;
 
 	Topic(std::string id){
 		_id = id;
@@ -63,9 +62,9 @@ public:
 		clients.push_back(cli);
 	}
 
-	void Notify(){
+	void Notify(std::string msg){
 		for (auto i : clients){
-			i->Update(_msg);
+			i->Update(msg);
 		}
 	}
 
@@ -80,10 +79,11 @@ public:
 
 class Broker{
 	std::vector <Topic*> topics;
+	//set instead to avoid duplications?
 
 public:
-	void AddTopic(std::string topicid){
-		Topic * topic = new Topic(topicid);
+	void AddTopic(std::string topicId){
+		Topic * topic = new Topic(topicId);
 		topics.push_back(topic);
 	}
 
@@ -95,17 +95,14 @@ public:
 			return nullptr;
 		}
 	}
+
+	void Publish (std::string topicID, std::string msg){
+		Topic * topic = GetTopicById(topicID);
+			topic->Notify(msg);
+	}
+
+
 };
 
 
 
-
-	//	if (PUB){
-	//		Topic * topic = GetTopicByid(topicid){
-	//			topic->Notify(msg);
-//		}
-//	}
-
-
-
-}

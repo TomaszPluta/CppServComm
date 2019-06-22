@@ -30,12 +30,14 @@ int main ( int argc, char * argv[] )
 		{
 		  std::string frame;
 		  new_sock >> frame;
-		  std::cout<<new_sock.get_cli_addr();
-		  if(frame.find("subscribe")){
+		  if(frame.find("subscribe") !=  std::string::npos){
 			  std::size_t pos = frame.find(":");
-			  std::string topic = frame.substr(pos+1);
-			  broker.AddTopic(topic);
+			  if (pos != std::string::npos){
+				  std::string topic = frame.substr(pos+1);
+				  broker.AddTopic(topic);
+			  }
 		  }
+
 		}
 	    }
 	  catch ( SocketException& ) {}
