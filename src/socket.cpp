@@ -105,22 +105,6 @@ bool Socket::accept ( Socket& new_socket ) const
 		return false;
 	}
 	else{
-		new_socket.m_addr = m_addr;
-		//	  // deal with both IPv4 and IPv6:
-		//	  int port;
-		//	  char ipstr[INET6_ADDRSTRLEN];
-		//	  sockaddr_storage * addr = (sockaddr_storage) m_addr;
-		//	  if (m_addr.ss_family == AF_INET) {
-		//	      struct sockaddr_in *s = (struct sockaddr_in *)&m_addr;
-		//	      port = ntohs(s->sin_port);
-		//	      inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
-		//	  } else { // AF_INET6
-		//	      struct sockaddr_in6 *s = (struct sockaddr_in6 *)&m_addr;
-		//	      port = ntohs(s->sin6_port);
-		//	      inet_ntop(AF_INET6, &s->sin6_addr, ipstr, sizeof ipstr);
-		//	  }
-		//
-		//	  printf("Peer IP address: %s\n", ipstr);
 		return true;
 	}
 }
@@ -254,6 +238,11 @@ void Socket::set_non_blocking ( const bool b )
 
 std::string Socket::get_addr(void){
 	struct sockaddr_in *s = (struct sockaddr_in *)&m_addr;
+	  int sd = -1; /* init to invalid socket */
+	  socklen_t sl = sizeof(*s);
+	  if (getpeername(m_sock, (sockaddr *) s,  &sl))
+
+
 	int port = ntohs(s->sin_port);
 	char ipstr[INET6_ADDRSTRLEN];
 	inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof ipstr);

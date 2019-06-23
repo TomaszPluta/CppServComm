@@ -17,7 +17,6 @@ using Msg = std::string;
 
 
 class Client{
-	std::vector<std::string> subscriptions;
 
 
 public:
@@ -81,7 +80,6 @@ class Broker{
 	std::vector <Topic*> topics;
 	//set instead to avoid duplications?
 
-public:
 	void AddTopic(std::string topicId){
 		Topic * topic = new Topic(topicId);
 		topics.push_back(topic);
@@ -96,6 +94,18 @@ public:
 		}
 	}
 
+public:
+
+
+	void AddSubscription(std::string topicId, std::string address){
+		Topic * topic =  GetTopicById(topicId);
+		Client * cli = new Client; // =  authorizer.GetClient(address);
+		topic->Attach(cli);
+	}
+
+
+
+
 	void Publish (std::string topicID, std::string msg){
 		Topic * topic = GetTopicById(topicID);
 			topic->Notify(msg);
@@ -104,5 +114,4 @@ public:
 
 };
 
-
-
+}
