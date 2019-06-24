@@ -24,6 +24,7 @@ m_sock ( -1 )
 
 Socket::~Socket()
 {
+	std::cout<<"socket is DESCRUCTED!"<<std::endl;
 	if ( is_valid() )
 		::close ( m_sock );
 }
