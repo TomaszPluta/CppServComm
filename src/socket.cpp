@@ -241,7 +241,7 @@ std::string Socket::get_addr(void){
 	struct sockaddr_in *s = (struct sockaddr_in *)&m_addr;
 	  socklen_t sl = sizeof(*s);
 	  std::string str;
-	  if (getpeername(m_sock, (sockaddr *) s,  &sl)){
+	  getpeername(m_sock, (sockaddr *) s,  &sl);
 
 		int port = ntohs(s->sin_port);
 		char ipstr[INET6_ADDRSTRLEN];
@@ -249,7 +249,7 @@ std::string Socket::get_addr(void){
 		str.append(ipstr);
 		str.append(":");
 		str.append(std::to_string(port));
-	  }
+
 		return str;
 }
 
