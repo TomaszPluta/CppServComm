@@ -36,8 +36,7 @@ while(1){
 
 			  std::string addr;
 			  frame = GetFrame();
-			  broker.OnReceivedFrame(frame, addr);
-			  new_sock << "all ok";
+			  new_sock << broker.OnReceivedFrame(frame, addr);
 		  }
 	  }else {
 

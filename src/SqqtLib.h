@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <functional>
 
 namespace Hqqt{
 
@@ -80,6 +81,8 @@ class Broker{
 	std::vector <Topic*> topics;
 	//set instead to avoid duplications?
 
+	std::function SendCallback = <void(std::string, std::string)>;
+
 	void AddTopic(std::string topicId){
 		Topic * topic = new Topic(topicId);
 		topics.push_back(topic);
@@ -93,6 +96,8 @@ class Broker{
 			return nullptr;
 		}
 	}
+
+
 
 public:
 
