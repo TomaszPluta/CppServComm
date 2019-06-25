@@ -239,17 +239,18 @@ void Socket::set_non_blocking ( const bool b )
 
 std::string Socket::get_addr(void){
 	struct sockaddr_in *s = (struct sockaddr_in *)&m_addr;
-	  int sd = -1; /* init to invalid socket */
 	  socklen_t sl = sizeof(*s);
-	  if (getpeername(m_sock, (sockaddr *) s,  &sl))
+	  std::string str;
+	  if (getpeername(m_sock, (sockaddr *) s,  &sl)){
 
-
-	int port = ntohs(s->sin_port);
-	char ipstr[INET6_ADDRSTRLEN];
-	inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
-	std::string str(ipstr);
-	//str<<port;
-	return str;
+		int port = ntohs(s->sin_port);
+		char ipstr[INET6_ADDRSTRLEN];
+		inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
+		str.append(ipstr);
+		str.append(":");
+		str.append(std::to_string(port));
+	  }
+		return str;
 }
 
 

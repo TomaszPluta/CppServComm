@@ -31,7 +31,7 @@ while(1){
 			  new_sock >> frame;
 
 			  std::cout << "Server got:" << frame <<std::endl;
-			  std::cout << new_sock.get_cli_addr() <<std::endl;
+			  std::cout << "Peer addr" << new_sock.get_cli_addr() <<std::endl;
 
 
 			  std::string addr;
