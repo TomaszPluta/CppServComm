@@ -12,6 +12,11 @@ std::string GetFrame(){
 }
 
 
+void SocketSend(std::string addr, std::string msg){
+
+}
+
+
 
 int main ( int argc, char * argv[] )
 {
@@ -32,7 +37,10 @@ while(1){
 
 			  std::cout << "Server got:" << frame <<std::endl;
 			  std::cout << "Peer addr" << new_sock.get_cli_addr() <<std::endl;
-
+//
+//			  auto SendCallback[&](std::string addr, std::string msg){
+//
+//			  };
 
 			  std::string addr;
 			  frame = GetFrame();

@@ -17,36 +17,46 @@ using Msg = std::string;
 
 
 
-class Client{
 
+template <class T>
+class Client{
+	T & _obj;
 
 public:
+	Client(T &obj): _obj(obj){};
 	std::string addr; ///prv
 
+	void Send (Msg msg){
+		_obj << msg;
+	}
+
 	void Update(Msg msg){
-		;
+		_obj << msg;
 	}
+
 
 };
 
-
-class Authoriser {
-public:
-	std::vector<Client*> clients;
-	void AddClient(Client* cli){
-		clients.push_back(cli);
-	}
-	bool IsAuthorised(Client * cli){
-		return true;
-	}
-
-};
-
-
+//
+//class Authoriser {
+//public:
+//	std::vector<Client*> clients;
+//	void AddClient(Client* cli){
+//		clients.push_back(cli);
+//	}
+//	bool IsAuthorised(Client * cli){
+//		return true;
+//	}
+//
+//};
 
 
+
+template <class T>
 class Topic{
-	std::vector <Client *> clients;
+
+	std::vector <Client<T> *> clients;
+
 public:
 	Topicid _id;
 
@@ -54,11 +64,11 @@ public:
 		_id = id;
 	}
 
-	void Attach (Client* cli){
+	void Attach (Client<T>* cli){
 		clients.push_back(cli);
 	}
 
-	void Detach (Client* cli){
+	void Detach (Client<T>* cli){
 		clients.push_back(cli);
 	}
 
@@ -72,16 +82,20 @@ public:
 
 
 
-
-
-
-
+//template<class T>
+//class Sender{
+//	T & obj;
+//public:
+//	void Send(std::string msg){
+//		obj<<msg;
+//	}
+//};
+//
 
 class Broker{
 	std::vector <Topic*> topics;
 	//set instead to avoid duplications?
 
-	std::function SendCallback = <void(std::string, std::string)>;
 
 	void AddTopic(std::string topicId){
 		Topic * topic = new Topic(topicId);
