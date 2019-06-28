@@ -92,18 +92,22 @@ public:
 //};
 //
 
+
+//https://www.codeproject.com/Articles/3267/Implementing-a-Subject-Observer-Pattern-with-Templ
+
+template <class T>
 class Broker{
-	std::vector <Topic*> topics;
+	std::vector <Topic<T>*> topics;
 	//set instead to avoid duplications?
 
 
 	void AddTopic(std::string topicId){
-		Topic * topic = new Topic(topicId);
+		Topic<T>  * topic= new Topic<T>(topicId);
 		topics.push_back(topic);
 	}
 
-	Topic * GetTopicById(Topicid id){
-		auto it = std::find_if(topics.begin(), topics.end(), [&](Topic * topic){return (topic->_id  == id);});
+	Topic<T> * GetTopicById(Topicid id){
+		auto it = std::find_if(topics.begin(), topics.end(), [&](Topic<T> * topic){return (topic->_id  == id);});
 		if (it != topics.end()){
 			return *it;
 		} else {
@@ -115,12 +119,12 @@ class Broker{
 
 public:
 
-	std::string OnReceivedFrame(const std::string& frame, std::string addr){
+	std::string OnReceivedFrame(const std::string& frame, T& senderObj){
 		if(frame.find("subscribe") !=  std::string::npos){
 			std::size_t pos = frame.find(":");
 			if (pos != std::string::npos){
 				std::string topic = frame.substr(pos+1);
-				AddSubscription(topic, addr);
+				AddSubscription(topic, senderObj);
 				return "subscribe ok";
 			}
 		}
@@ -143,18 +147,24 @@ public:
 	}
 
 
-	void AddSubscription(std::string topicId, std::string cliAddr){
-		Topic * topic =  GetTopicById(topicId);
-		Client * cli = new Client; // =  authorizer.GetClient(address);
-		cli->addr = cliAddr;
+	void AddSubscription(std::string topicId, T &obj){
+		Topic<T> * topic =  GetTopicById(topicId); //opaque with lines below
+		if (topic == nullptr){
+			topic = new Topic<T>(topicId);
+		}
+		Client<T> * cli = new Client<T>(obj);
+	//	cli->addr = cliAddr;
 		topic->Attach(cli);
 	}
 
 
 
 
-	void Publish (std::string topicID, std::string msg){
-		Topic * topic = GetTopicById(topicID);
+	void Publish (std::string topicId, std::string msg){
+		Topic<T> * topic = GetTopicById(topicId);
+		if (topic == nullptr){
+					topic = new Topic<T>(topicId);
+				}
 			topic->Notify(msg);
 	}
 

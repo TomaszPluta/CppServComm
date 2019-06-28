@@ -22,7 +22,7 @@ int main ( int argc, char * argv[] )
 {
 
 
-	Hqqt::Broker broker;
+	Hqqt::Broker<ServerSocket> broker;
   std::cout << "Server running....\n";
       ServerSocket server ( 1886 );
 
@@ -43,8 +43,8 @@ while(1){
 //			  };
 
 			  std::string addr;
-			  frame = GetFrame();
-			  new_sock << broker.OnReceivedFrame(frame, addr);
+		//	  frame = GetFrame();
+			  new_sock << broker.OnReceivedFrame(frame, new_sock);
 		  }
 	  }else {
 
