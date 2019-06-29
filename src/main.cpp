@@ -3,13 +3,12 @@
 #include "SqqtLib.h"
 #include <string>
 #include <iostream>
-#include <string>
 
 
 
-std::string GetFrame(){
-;
-}
+//std::string GetFrame(){
+//;
+//}
 
 
 void SocketSend(std::string addr, std::string msg){
@@ -17,9 +16,9 @@ void SocketSend(std::string addr, std::string msg){
 }
 
 
-
 int main ( int argc, char * argv[] )
 {
+
 
 
 	Hqqt::Broker<ServerSocket> broker;
@@ -30,21 +29,28 @@ while(1){
 	  ServerSocket new_sock;
 	  server.accept ( new_sock );
 	  if (fork() == 0){
-		  while (1){
-			  std::cout << "child here:" << std::endl;
-			  std::string frame;
-			  new_sock >> frame;
+		  try{
+			  while (1){
 
-			  std::cout << "Server got:" << frame <<std::endl;
-			  std::cout << "Peer addr" << new_sock.get_cli_addr() <<std::endl;
-//
-//			  auto SendCallback[&](std::string addr, std::string msg){
-//
-//			  };
+				  std::cout << "child here:" << std::endl;
+				  std::string frame;
+				  new_sock >> frame;
 
-			  std::string addr;
-		//	  frame = GetFrame();
-			  new_sock << broker.OnReceivedFrame(frame, new_sock);
+				  std::cout << "Server got:" << frame <<std::endl;
+				  std::cout << "Peer addr" << new_sock.get_cli_addr() <<std::endl;
+	//
+	//			  auto SendCallback[&](std::string addr, std::string msg){
+	//
+	//			  };
+
+				  std::string addr;
+			//	  frame = GetFrame();
+				  new_sock << broker.OnReceivedFrame(frame, new_sock);
+			  }
+			  }
+		  catch (...){
+			  std::cout<<"client closed connection"<<std::endl;
+			  exit(0);
 		  }
 	  }else {
 
