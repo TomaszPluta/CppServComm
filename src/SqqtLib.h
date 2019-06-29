@@ -6,6 +6,7 @@
 #include <string>
 #include <algorithm>
 #include <functional>
+#include <sstream>
 
 namespace Hqqt{
 
@@ -120,29 +121,31 @@ class Broker{
 public:
 
 	std::string OnReceivedFrame(const std::string& frame, T& senderObj){
-		if(frame.find("subscribe") !=  std::string::npos){
-			std::size_t pos = frame.find(":");
-			if (pos != std::string::npos){
-				std::string topic = frame.substr(pos+1);
-				AddSubscription(topic, senderObj);
-				return "subscribe ok";
-			}
+
+		std::stringstream frameStream(frame);
+		std::string token;
+		std::vector<std::string> tokenList;
+
+		while(std::getline(frameStream, token, ':'))
+		{
+			tokenList.push_back(token);
 		}
 
-		if(frame.find("publish") !=  std::string::npos){
-			std::size_t pos = frame.find(":");
-			std::string topicId;
-			if (pos != std::string::npos){
-				topicId = frame.substr(pos+1);
-			}
-			pos = frame.find(":");
-			std::string msg;
-			if (pos != std::string::npos){
-				msg = frame.substr(pos+1);
-				Publish(topicId, msg);
-				return "publish ok";
-			}
+
+		constexpr   int Head = 0; //convert vector to map
+		constexpr   int Topic = 1;
+		constexpr   int Msg = 2;
+
+		if(tokenList[Head] == "subscribe"){ //map
+			AddSubscription(tokenList[Topic], senderObj);
+			return "subscribe ok";
 		}
+
+		if(tokenList[Head] == "publish"){ //map
+			Publish(tokenList[Topic], tokenList[Topic]);
+			return "publish ok";
+		}
+
 		return "no matching frame found";
 	}
 
