@@ -139,6 +139,7 @@ bool Socket::send ( const std::vector<char> vec ) const
 	}
 }
 
+//https://stackoverflow.com/questions/3455351/c-strange-socket-data
 
 int Socket::recv ( std::string& s ) const
 {
@@ -147,7 +148,6 @@ int Socket::recv ( std::string& s ) const
 	s = "";
 
 	memset ( buf, 0, MAXRECV + 1 );
-
 	int status = ::recv ( m_sock, buf, MAXRECV, 0 );
 
 	if ( status == -1 )
@@ -161,6 +161,7 @@ int Socket::recv ( std::string& s ) const
 	}
 	else
 	{
+		buf[status] = '\0';
 		s = buf;
 		return status;
 	}
