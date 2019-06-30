@@ -32,12 +32,12 @@ while(1){
 		  try{
 			  while (1){
 
-				  std::cout << "child here:" << std::endl;
+				  std::cout << "child process here:" << std::endl;
 				  std::string frame;
 				  new_sock >> frame;
 
 				  std::cout << "Server got:" << frame <<std::endl;
-				  std::cout << "Peer addr" << new_sock.get_cli_addr() <<std::endl;
+				  std::cout << "from peer addr: " << new_sock.get_cli_addr() <<std::endl;
 	//
 	//			  auto SendCallback[&](std::string addr, std::string msg){
 	//

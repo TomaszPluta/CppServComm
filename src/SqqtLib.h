@@ -154,10 +154,11 @@ public:
 		Topic<T> * topic =  GetTopicById(topicId); //opaque with lines below
 		if (topic == nullptr){
 			topic = new Topic<T>(topicId);
+			topics.push_back(topic);
 		}
 		Client<T> * cli = new Client<T>(obj);
-	//	cli->addr = cliAddr;
 		topic->Attach(cli);
+
 	}
 
 
