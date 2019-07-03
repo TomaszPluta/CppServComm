@@ -98,7 +98,7 @@ public:
 
 template <class T>
 class Broker{
-	std::vector <Topic<T>*> topics;
+
 	//set instead to avoid duplications?
 
 
@@ -119,6 +119,7 @@ class Broker{
 
 
 public:
+	std::vector <Topic<T>*> topics;
 
 	std::string OnReceivedFrame(const std::string& frame, T& senderObj){
 
