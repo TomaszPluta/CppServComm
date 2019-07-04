@@ -40,7 +40,7 @@ void SocketSend(std::string addr, std::string msg){
               
               
 
-void t1 (ServerSocket server, ServerSocket new_sock ){
+void t1 ( ServerSocket new_sock ){
 
     Hqqt::Broker<ServerSocket> broker;
      try{
@@ -75,11 +75,11 @@ ServerSocket server ( 1886 );
 
 ServerSocket new_sock;
 server.accept ( new_sock );
- thObj = std::thread(t1, std::ref(server), std::ref(new_sock));
+ thObj = std::thread(t1,  std::ref(new_sock));
 
  ServerSocket new_sock2;
  server.accept ( new_sock2 );
- thObj2 = std::thread(t1, std::ref(server), std::ref(new_sock2));
+ thObj2 = std::thread(t1, std::ref(new_sock2));
                  
             
 
