@@ -62,17 +62,19 @@ void t1 ( ServerSocket new_sock ){
             }
 }
 
-
+//thread pool z boosta: https://stackoverflow.com/questions/19500404/how-to-create-a-thread-pool-using-boost-in-c
 
 int main ( int argc, char * argv[] )
 {
 Hqqt::Broker<ServerSocket> broker;
 std::thread thObj;
 std::thread thObj2;
+std::thread thObj3;
 
 std::cout << "Server running....\n";
 ServerSocket server ( 1886 );
 
+    while(1){
 ServerSocket new_sock;
 server.accept ( new_sock );
  thObj = std::thread(t1,  std::ref(new_sock));
@@ -80,10 +82,14 @@ server.accept ( new_sock );
  ServerSocket new_sock2;
  server.accept ( new_sock2 );
  thObj2 = std::thread(t1, std::ref(new_sock2));
-                 
+ 
+ ServerSocket new_sock3;
+ server.accept ( new_sock3 );
+ thObj3 = std::thread(t1, std::ref(new_sock3));
+    }
             
 
-              while(1);
+          
 
   thObj.join();
   thObj2.join();
