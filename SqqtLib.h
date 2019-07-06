@@ -135,7 +135,7 @@ public:
 
 		constexpr   int Head = 0; //convert vector to map
 		constexpr   int Topic = 1;
-		constexpr   int Msg = 2;
+	//	constexpr   int Msg = 2;
 
 		if(tokenList[Head] == "subscribe"){ //map
 			AddSubscription(tokenList[Topic], senderObj);

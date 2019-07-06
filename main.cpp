@@ -1,100 +1,101 @@
 #include "serv.h"
 #include "SocketException.h"
 #include "SqqtLib.h"
+#include "ThreadPool.h"
+
 #include <string>
 #include <iostream>
-
 #include <functional>
 #include <thread>
+
 
 //std::string GetFrame(){
 //;
 //}
 
 
-void SocketSend(std::string addr, std::string msg){
+void SocketSend(std::string addr, std::string msg)
+{
 
 }
 
-//
-// auto ThreadLambda = [&](){
-//                        try{
-//                                while (1){
-//                                        std::cout << "child process here:" << std::endl;
-//                                        std::string frame;
-//                                        new_sock >> frame;
-//
-//                                        std::cout << "Server got:" << frame <<std::endl;
-//                                        std::cout << "from peer addr: " << new_sock.get_cli_addr() <<std::endl;
-//                                        std::string addr;
-//                              //	  frame = GetFrame();
-//                                        new_sock << broker.OnReceivedFrame(frame, new_sock);
-//                                }
-//                                }
-//                        catch (...){
-//                                std::cout<<"client closed connection"<<std::endl;
-//                                exit(0);
-//                        }
-//              };
-              
-              
-              
 
-void t1 ( ServerSocket new_sock ){
+auto t1Lambda = [&] ( ServerSocket new_sock )
+{
 
     Hqqt::Broker<ServerSocket> broker;
-     try{
-                    while (1){
-                            std::cout << "child process here:" << std::endl;
-                            std::string frame;
-                            new_sock >> frame;
+    try {
+        while (1) {
+            std::cout << "child process here:" << std::endl;
+            std::string frame;
+            new_sock >> frame;
 
-                            std::cout << "Server got:" << frame <<std::endl;
-                            std::cout << "from peer addr: " << new_sock.get_cli_addr() <<std::endl;
-                            std::string addr;
-                  //	  frame = GetFrame();
-                            new_sock << broker.OnReceivedFrame(frame, new_sock);
-                    }
-                    }
-            catch (...){
-                    std::cout<<"client closed connection"<<std::endl;
-                    exit(0);
-            }
+            std::cout << "Server got:" << frame <<std::endl;
+            std::cout << "from peer addr: " << new_sock.get_cli_addr() <<std::endl;
+            std::string addr;
+            //	  frame = GetFrame();
+            new_sock << broker.OnReceivedFrame(frame, new_sock);
+        }
+    } catch (...) {
+        std::cout<<"client closed connection"<<std::endl;
+        exit(0);
+    }
+};
+
+
+
+void t1 ( ServerSocket new_sock )
+{
+
+    Hqqt::Broker<ServerSocket> broker;
+    try {
+        while (1) {
+            std::cout << "child process here:" << std::endl;
+            std::string frame;
+            new_sock >> frame;
+
+            std::cout << "Server got:" << frame <<std::endl;
+            std::cout << "from peer addr: " << new_sock.get_cli_addr() <<std::endl;
+            std::string addr;
+            //	  frame = GetFrame();
+            new_sock << broker.OnReceivedFrame(frame, new_sock);
+        }
+    } catch (...) {
+        std::cout<<"client closed connection"<<std::endl;
+        exit(0);
+    }
 }
 
-//thread pool z boosta: https://stackoverflow.com/questions/19500404/how-to-create-a-thread-pool-using-boost-in-c
+//get to know:
+//https://www.modernescpp.com/index.php/c-core-guidelines-be-aware-of-the-traps-of-condition-variables
 
 int main ( int argc, char * argv[] )
 {
-Hqqt::Broker<ServerSocket> broker;
-std::thread thObj;
-std::thread thObj2;
-std::thread thObj3;
+    Hqqt::Broker<ServerSocket> broker;
+    ThreadPool pool(4);
 
-std::cout << "Server running....\n";
-ServerSocket server ( 1886 );
-
-    while(1){
-ServerSocket new_sock;
-server.accept ( new_sock );
- thObj = std::thread(t1,  std::ref(new_sock));
-
- ServerSocket new_sock2;
- server.accept ( new_sock2 );
- thObj2 = std::thread(t1, std::ref(new_sock2));
- 
- ServerSocket new_sock3;
- server.accept ( new_sock3 );
- thObj3 = std::thread(t1, std::ref(new_sock3));
+    std::cout << "Server running....\n";
+    ServerSocket server ( 1886 );
+    
+  
+    while(1) {
+        ServerSocket new_sock;
+        ServerSocket new_sock2;
+        
+        server.accept ( new_sock );
+        pool.enqueue(t1, std::ref(new_sock));
+         
+        server.accept ( new_sock2);
+        
+        pool.enqueue(t1, std::ref(new_sock2));
+         
+        while (1);
     }
-            
 
-          
 
-  thObj.join();
-  thObj2.join();
-  std::cout << "Server end\n";
-  return 0;
+
+    std::cout << "Server end"<<std::endl;
+    return 0;
 }
 
 
