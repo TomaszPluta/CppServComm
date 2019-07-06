@@ -43,11 +43,9 @@ auto t1Lambda = [&] ( ServerSocket new_sock )
 };
 
 
-
-void t1 ( ServerSocket new_sock )
+void t1 ( ServerSocket new_sock,    Hqqt::Broker<ServerSocket> & broker)
 {
-
-    Hqqt::Broker<ServerSocket> broker;
+    //Hqqt::Broker<ServerSocket> broker;
     try {
         while (1) {
             std::cout << "child process here:" << std::endl;
@@ -82,7 +80,7 @@ int main ( int argc, char * argv[] )
         ServerSocket  * cliSocket = new(ServerSocket);
 
         server.accept (*cliSocket );
-        pool.enqueue(t1, std::ref(*cliSocket));
+        pool.enqueue(t1, std::ref(*cliSocket), std::ref(broker));
          
         //while (1);
     }
