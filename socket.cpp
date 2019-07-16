@@ -139,7 +139,6 @@ bool Socket::send ( const std::vector<char> vec ) const
 	}
 }
 
-//https://stackoverflow.com/questions/3455351/c-strange-socket-data
 
 int Socket::recv ( std::string& s ) const
 {

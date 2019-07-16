@@ -135,7 +135,7 @@ public:
 
 		constexpr   int Head = 0; //convert vector to map
 		constexpr   int Topic = 1;
-	//	constexpr   int Msg = 2;
+		constexpr   int Msg = 2;
 
 		if(tokenList[Head] == "subscribe"){ //map
 			AddSubscription(tokenList[Topic], senderObj);
@@ -143,7 +143,7 @@ public:
 		}
 
 		if(tokenList[Head] == "publish"){ //map
-			Publish(tokenList[Topic], tokenList[Topic]);
+			Publish(tokenList[Topic], tokenList[Msg]);
 			return "publish ok";
 		}
 
