@@ -7,8 +7,12 @@
 #include <algorithm>
 #include <functional>
 #include <sstream>
+#include <chrono>
+
 
 namespace Hqqt{
+    
+using namespace std::chrono_literals;
 
 using Addr = std::string;
 using Topicid = std::string;
@@ -76,6 +80,7 @@ public:
 	void Notify(std::string msg){
 		for (auto i : clients){
 			i->Update(msg);
+            sleep(1);
 		}
 	}
 
@@ -94,7 +99,7 @@ public:
 //
 
 
-//https://www.codeproject.com/Articles/3267/Implementing-a-Subject-Observer-Pattern-with-Templ
+
 
 template <class T>
 class Broker{

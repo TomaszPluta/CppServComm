@@ -2,6 +2,7 @@
 #include "SocketException.h"
 #include "SqqtLib.h"
 #include "ThreadPool.h"
+#include "ExternalLibraries/MySQL-CRUD-CPP/Database.h"
 
 #include <string>
 #include <iostream>
@@ -12,6 +13,7 @@
 //std::string GetFrame(){
 //;
 //}
+
 
 
 void SocketSend(std::string addr, std::string msg)
@@ -55,7 +57,8 @@ void t1 ( ServerSocket new_sock,    Hqqt::Broker<ServerSocket> & broker)
             std::cout << "Server got:" << frame <<std::endl;
             std::cout << "from peer addr: " << new_sock.get_cli_addr() <<std::endl;
             std::string addr;
-            //	  frame = GetFrame();
+            std::mutex m;
+            std::unique_lock<std::mutex> mLock(m);
             new_sock << broker.OnReceivedFrame(frame, new_sock);
         }
     } catch (...) {
@@ -63,9 +66,6 @@ void t1 ( ServerSocket new_sock,    Hqqt::Broker<ServerSocket> & broker)
         exit(0);
     }
 }
-
-//get to know:
-//https://www.modernescpp.com/index.php/c-core-guidelines-be-aware-of-the-traps-of-condition-variables
 
 
 
@@ -75,6 +75,10 @@ constexpr int PoolSize = 4;
 
 int main ( int argc, char * argv[] )
 {
+    
+DB::Database *database = new DB::Database("localhost", "3306", "sqqt", "1234", "sqqtDB");
+    database->Insert("INSERT INTO users(id,status) VALUES (?,?)", { "S:House","I:100" });
+    
     Hqqt::Broker<ServerSocket> broker;
     ThreadPool pool(PoolSize);
 
