@@ -47,7 +47,6 @@ auto t1Lambda = [&] ( ServerSocket new_sock )
 
 void t1 ( ServerSocket new_sock,    Hqqt::Broker<ServerSocket> & broker)
 {
-    //Hqqt::Broker<ServerSocket> broker;
     try {
         while (1) {
               std::cout<<"- - - - - - - - "<<std::endl;
@@ -77,7 +76,13 @@ int main ( int argc, char * argv[] )
 {
     
 DB::Database *database = new DB::Database("localhost", "3306", "sqqt", "1234", "sqqtDB");
-    database->Insert("INSERT INTO users(id,status) VALUES (?,?)", { "S:House","I:100" });
+std::vector<std::vector<std::string>> users = database->Get("SELECT * FROM users", 2);
+   
+for (int i =0; i < users.size(); i++){
+    for (int j =0; j < users[i].size(); j++){
+        std::cout<<users[i][j] << " ";
+    } std::cout<<std::endl;
+}
     
     Hqqt::Broker<ServerSocket> broker;
     ThreadPool pool(PoolSize);
@@ -90,6 +95,8 @@ DB::Database *database = new DB::Database("localhost", "3306", "sqqt", "1234", "
         ServerSocket  * cliSocket = new(ServerSocket);
 
         server.accept (*cliSocket );
+       
+database->Insert("INSERT INTO users(id,status) VALUES (?,?)", { "S:"+cliSocket->get_cli_addr(),"I:100" });
         pool.enqueue(t1, std::ref(*cliSocket), std::ref(broker));
     }
 
