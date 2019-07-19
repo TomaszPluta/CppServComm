@@ -37,6 +37,8 @@ auto t1Lambda = [&] ( ServerSocket new_sock )
 };
 
 
+
+
 void t1 ( ServerSocket new_sock,    Hqqt::Broker<ServerSocket> & broker)
 {
     try {
@@ -58,21 +60,19 @@ void t1 ( ServerSocket new_sock,    Hqqt::Broker<ServerSocket> & broker)
     }
 }
 
-
-
-
 constexpr int ServPort = 1886;
 constexpr int PoolSize = 4;
+constexpr int ColumnNo = 3;
 
 int main ( int argc, char * argv[] )
 {
     
 DB::Database *database = new DB::Database("localhost", "3306", "sqqt", "1234", "sqqtDB");
-std::vector<std::vector<std::string>> users = database->Get("SELECT * FROM users", 3);
+std::vector<std::vector<std::string>> users = database->Get("SELECT * FROM users", ColumnNo);
    
 for (int i =0; i < users.size(); i++){
     for (int j =0; j < users[i].size(); j++){
-        std::cout<<users[i][j] << " ";
+        std::cout<<users[i][j] << " | ";
     } std::cout<<std::endl;
 }
     
@@ -82,10 +82,8 @@ for (int i =0; i < users.size(); i++){
     std::cout << "Server is running...."<<std::endl;
     ServerSocket server ( ServPort );
     
-  
     while(1) {
-        ServerSocket  * cliSocket = new(ServerSocket);
-
+      ServerSocket  * cliSocket = new(ServerSocket);
       server.accept (*cliSocket );
       
   
