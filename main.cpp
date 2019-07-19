@@ -35,19 +35,32 @@ auto WorkerThread = [&] ( ServerSocket new_sock ,  Hqqt::Broker<ServerSocket> &b
 };
 
 
+void PrintDatabase (DB::Database *database)
+{
+    std::vector<std::vector<std::string>> users = database->Get("SELECT * FROM users", ColumnNo);
+    for (int i =0; i < users.size(); i++) {
+        for (int j =0; j < users[i].size(); j++) {
+            std::cout<<users[i][j] << " | ";
+        }
+        std::cout<<std::endl;
+    }
+}
+
+std::string GetTimeNow (){
+     std::chrono::system_clock::time_point timeNow  = std::chrono::system_clock::now();
+     std::time_t timeConv =  std::chrono::system_clock::to_time_t(timeNow);
+     std::string tNow=   std::string(ctime(&timeConv));
+     return tNow;
+}
+
+
 
 
 int main ( int argc, char * argv[] )
 {
     
 DB::Database *database = new DB::Database("localhost", "3306", "sqqt", "1234", "sqqtDB");
-std::vector<std::vector<std::string>> users = database->Get("SELECT * FROM users", ColumnNo);
-   
-for (int i =0; i < users.size(); i++){
-    for (int j =0; j < users[i].size(); j++){
-        std::cout<<users[i][j] << " | ";
-    } std::cout<<std::endl;
-}
+PrintDatabase(database);
     
     Hqqt::Broker<ServerSocket> broker;
     ThreadPool pool(PoolSize);
@@ -59,16 +72,9 @@ for (int i =0; i < users.size(); i++){
       ServerSocket  * cliSocket = new(ServerSocket);
       server.accept (*cliSocket );
         
-     std::chrono::system_clock::time_point timeNow  = std::chrono::system_clock::now();
-     std::time_t timeConv =  std::chrono::system_clock::to_time_t(timeNow);
-     std::cout << ctime(&timeConv) << std::endl; 
-    
-    
-    auto end = std::chrono::system_clock::now();
-    std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
     
-        database->Insert("INSERT INTO users(id,status,timeLogin) VALUES (?,?,?)", { "S:"+std::string(cliSocket->get_cli_addr()),"I:100", "S:" + std::string(ctime(&timeConv))});
+        database->Insert("INSERT INTO users(id,status,timeLogin) VALUES (?,?,?)", { "S:"+std::string(cliSocket->get_cli_addr()),"I:100", "S:" + GetTimeNow()});
         pool.enqueue(WorkerThread, std::ref(*cliSocket), std::ref(broker));
     }
 
