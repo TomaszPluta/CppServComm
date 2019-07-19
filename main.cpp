@@ -3,13 +3,37 @@
 #include "SqqtLib.h"
 #include "ThreadPool.h"
 #include "ExternalLibraries/MySQL-CRUD-CPP/Database.h"
-
 #include <string>
 #include <iostream>
 #include <functional>
 #include <thread>
 #include <chrono>
 #include <ctime> 
+
+
+
+#include "ExternalLibraries/mysql-cpp/MySql.hpp"
+#include "ExternalLibraries/mysql-cpp/MySqlException.hpp"
+
+#include <cassert>
+
+#include <iostream>
+#include <memory>
+#include <string>
+#include <tuple>
+#include <vector>
+
+using std::basic_ostream;
+using std::cin;
+using std::cout;
+using std::endl;
+using std::get;
+using std::ostream;
+using std::string;
+using std::tuple;
+using std::unique_ptr;
+using std::vector;
+
 
 
 constexpr int ServPort = 1886;
@@ -37,13 +61,13 @@ auto WorkerThread = [&] ( ServerSocket new_sock ,  Hqqt::Broker<ServerSocket> &b
 
 void PrintDatabase (DB::Database *database)
 {
-    std::vector<std::vector<std::string>> users = database->Get("SELECT * FROM users", ColumnNo);
-    for (int i =0; i < users.size(); i++) {
-        for (int j =0; j < users[i].size(); j++) {
-            std::cout<<users[i][j] << " | ";
-        }
-        std::cout<<std::endl;
-    }
+//    std::vector<std::vector<std::string>> users = database->Get("SELECT * FROM users", ColumnNo);
+//    for (int i =0; i < users.size(); i++) {
+//        for (int j =0; j < users[i].size(); j++) {
+//            std::cout<<users[i][j] << " | ";
+//        }
+//        std::cout<<std::endl;
+//    }
 }
 
 std::string GetTimeNow (){
@@ -54,14 +78,42 @@ std::string GetTimeNow (){
 }
 
 
-
+template <typename Tuple>
+void printTupleVector(const std::vector<Tuple>& v) {
+#if __GNUC__ >= 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)
+    for (const auto& item : v)
+    {
+     //   std::cout << item << std::endl;
+    }
+#elif __GNUC__ >= 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
+    auto end = v.cend();
+    for (auto item(v.cbegin()); item != end; ++item) {
+  //      std::cout << *item<< std::endl;
+    }
+#else
+    vector<Tuple>::const_iterator end(users.end());
+    for (
+        vector<Tuple>::const_iterator item(v.begin());
+        item != end;
+        ++item
+    ) {
+    //    std::cout << *item << endl;
+    }
+#endif
+}
 
 int main ( int argc, char * argv[] )
 {
+//    
+//DB::Database *database = new DB::Database("localhost", "3306", "sqqt", "1234", "sqqtDB");
+//PrintDatabase(database);
     
-DB::Database *database = new DB::Database("localhost", "3306", "sqqt", "1234", "sqqtDB");
-PrintDatabase(database);
-    
+    MySql connection("localhost", "sqqt", "1234");
+    connection.runCommand("USE sqqtDB");
+    vector<tuple<string, int>> users;
+    connection.runQuery(&users, "SELECT * FROM users");
+    printTupleVector(users);
+
     Hqqt::Broker<ServerSocket> broker;
     ThreadPool pool(PoolSize);
     ServerSocket server ( ServPort );
@@ -71,10 +123,8 @@ PrintDatabase(database);
     while(1) {
       ServerSocket  * cliSocket = new(ServerSocket);
       server.accept (*cliSocket );
-        
-
-    
-        database->Insert("INSERT INTO users(id,status,timeLogin) VALUES (?,?,?)", { "S:"+std::string(cliSocket->get_cli_addr()),"I:100", "S:" + GetTimeNow()});
+          
+//        database->Insert("INSERT INTO users(id,status,timeLogin) VALUES (?,?,?)", { "S:"+std::string(cliSocket->get_cli_addr()),"I:100", "S:" + GetTimeNow()});
         pool.enqueue(WorkerThread, std::ref(*cliSocket), std::ref(broker));
     }
 
