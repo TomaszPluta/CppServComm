@@ -25,7 +25,7 @@ public:
      MYSQL_ROW  mRow;
      
      
-     std::string result = " - ";
+     std::string result = " ";
      int cnt = mysql_field_count(&_mysql) ;
      if (cnt > 0){
     while ((mRow = mysql_fetch_row(mRes)) != NULL)

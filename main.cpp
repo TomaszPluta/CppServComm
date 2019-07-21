@@ -20,18 +20,6 @@
 
 #include "SqlWrapper.h"
 
-using std::basic_ostream;
-using std::cin;
-using std::cout;
-using std::endl;
-using std::get;
-using std::ostream;
-using std::string;
-using std::tuple;
-using std::unique_ptr;
-using std::vector;
-
-
 
 constexpr int ServPort = 1886;
 constexpr int PoolSize = 4;
@@ -70,21 +58,25 @@ SqlWrapper MySqlConnector;
 
 MySqlConnector.Connect("localhost","sqqt", "1234","sqqtDB");
 std:: string querryRes = MySqlConnector.SendQuerry("SELECT * FROM users");
-cout << querryRes<<endl;
-std:: string querryRes2 = MySqlConnector.SendQuerry("INSERT INTO users (id, status, timeLogin) VALUES ('Five', 5, '05:18')");
-std:: string querryRes3 = MySqlConnector.SendQuerry("SELECT * FROM users");
-cout << querryRes3<<endl;
+std::cout << querryRes<<std::endl;
+
+
+
 
     Hqqt::Broker<ServerSocket> broker;
     ThreadPool pool(PoolSize);
     ServerSocket server ( ServPort );
     std::cout << "Server is running...."<<std::endl;
 
-    
+    int CliCntr;
     while(1) {
       ServerSocket  * cliSocket = new(ServerSocket);
       server.accept (*cliSocket );
-          
+     
+        MySqlConnector.SendQuerry("INSERT INTO users (id, status, timeLogin) VALUES ('"+std::string(cliSocket->get_cli_addr())+"', '"+std::to_string(CliCntr)+"', '"+GetTimeNow()+"')");
+        std:: string querryRes3 = MySqlConnector.SendQuerry("SELECT * FROM users");
+        std::cout << querryRes3<<std::endl;
+        CliCntr++;
       pool.enqueue(WorkerThread, std::ref(*cliSocket), std::ref(broker));
     }
 
