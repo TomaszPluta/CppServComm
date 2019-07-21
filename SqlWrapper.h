@@ -1,0 +1,52 @@
+#include <mysql.h>
+#include <string>
+
+
+
+class SqlWrapper {
+    MYSQL _mysql;
+    
+public:
+
+
+    SqlWrapper (){
+         mysql_init(&_mysql);
+    }
+
+
+ void Connect(std::string host,  std::string user, std::string password ,std::string  dataBase){
+     mysql_real_connect(&_mysql,  host.c_str(), user.c_str(), password.c_str(),  dataBase.c_str(), 0, NULL, 0);
+     mysql_select_db(&_mysql, dataBase.c_str());
+ }
+ 
+ std::string  SendQuerry(std::string querry){
+     mysql_query(&_mysql, querry.c_str());
+     MYSQL_RES * mRes = mysql_store_result(&_mysql);
+     MYSQL_ROW  mRow;
+     
+     std::string result;
+    while ((mRow = mysql_fetch_row(mRes)) != NULL)
+    {
+        for (unsigned int i =0; i < mysql_num_fields(mRes); i++){
+            std::string data = (mRow[i]  == NULL ? "0" : mRow[i] );
+            result += data +  std::string(" | ");
+        }
+        result +=  "\n";
+    }
+    return result;
+ }
+ 
+ 
+std::string  Insert(std::string querry){
+     mysql_query(&_mysql, querry.c_str());
+     MYSQL_RES * mRes = mysql_store_result(&_mysql);
+     MYSQL_ROW  mRow;
+     
+     std::string result = " _ ";
+    return result;
+ }
+
+
+
+
+};

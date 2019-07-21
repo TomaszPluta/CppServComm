@@ -18,6 +18,8 @@
 #include <tuple>
 #include <vector>
 
+#include "SqlWrapper.h"
+
 using std::basic_ostream;
 using std::cin;
 using std::cout;
@@ -63,27 +65,15 @@ std::string GetTimeNow (){
 
 int main ( int argc, char * argv[] )
 {
-    
-MYSQL mysql;
-mysql_init(&mysql);
-if (mysql_real_connect(&mysql, "localhost","sqqt", "1234","sqqtDB", 0, NULL, 0)){
-    mysql_select_db(&mysql, "sqqtDB");
-    mysql_query(&mysql, "SELECT * FROM users");
-    MYSQL_RES * mRes = mysql_store_result(&mysql);
-    MYSQL_ROW  mRow;
-    while ((mRow = mysql_fetch_row(mRes)) != NULL)
-   {
-        for (int i =0; i < mysql_num_fields(mRes); i++){
-            std::string data = (mRow[i]  == NULL ? "0" : mRow[i] );
-            std::cout << data + " ";
-        }
-            std::cout << std::endl;
-    }
-    
-    
-} else{
-       std::cout<<" MySQL connecting error" << mysql_error(&mysql);
-}
+
+SqlWrapper MySqlConnector;
+
+MySqlConnector.Connect("localhost","sqqt", "1234","sqqtDB");
+std:: string querryRes = MySqlConnector.SendQuerry("SELECT * FROM users");
+cout << querryRes<<endl;
+std:: string querryRes2 = MySqlConnector.Insert("INSERT INTO users (id, status, timeLogin) VALUES ('Four', 4, '04:17')");
+std:: string querryRes3 = MySqlConnector.SendQuerry("SELECT * FROM users");
+cout << querryRes3<<endl;
 
     Hqqt::Broker<ServerSocket> broker;
     ThreadPool pool(PoolSize);
@@ -95,8 +85,7 @@ if (mysql_real_connect(&mysql, "localhost","sqqt", "1234","sqqtDB", 0, NULL, 0))
       ServerSocket  * cliSocket = new(ServerSocket);
       server.accept (*cliSocket );
           
-//        database->Insert("INSERT INTO users(id,status,timeLogin) VALUES (?,?,?)", { "S:"+std::string(cliSocket->get_cli_addr()),"I:100", "S:" + GetTimeNow()});
-        pool.enqueue(WorkerThread, std::ref(*cliSocket), std::ref(broker));
+      pool.enqueue(WorkerThread, std::ref(*cliSocket), std::ref(broker));
     }
 
 
