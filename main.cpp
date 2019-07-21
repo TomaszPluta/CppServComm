@@ -71,7 +71,7 @@ SqlWrapper MySqlConnector;
 MySqlConnector.Connect("localhost","sqqt", "1234","sqqtDB");
 std:: string querryRes = MySqlConnector.SendQuerry("SELECT * FROM users");
 cout << querryRes<<endl;
-std:: string querryRes2 = MySqlConnector.Insert("INSERT INTO users (id, status, timeLogin) VALUES ('Four', 4, '04:17')");
+std:: string querryRes2 = MySqlConnector.SendQuerry("INSERT INTO users (id, status, timeLogin) VALUES ('Five', 5, '05:18')");
 std:: string querryRes3 = MySqlConnector.SendQuerry("SELECT * FROM users");
 cout << querryRes3<<endl;
 

@@ -24,7 +24,10 @@ public:
      MYSQL_RES * mRes = mysql_store_result(&_mysql);
      MYSQL_ROW  mRow;
      
-     std::string result;
+     
+     std::string result = " - ";
+     int cnt = mysql_field_count(&_mysql) ;
+     if (cnt > 0){
     while ((mRow = mysql_fetch_row(mRes)) != NULL)
     {
         for (unsigned int i =0; i < mysql_num_fields(mRes); i++){
@@ -33,20 +36,10 @@ public:
         }
         result +=  "\n";
     }
+     }
     return result;
  }
  
- 
-std::string  Insert(std::string querry){
-     mysql_query(&_mysql, querry.c_str());
-     MYSQL_RES * mRes = mysql_store_result(&_mysql);
-     MYSQL_ROW  mRow;
-     
-     std::string result = " _ ";
-    return result;
- }
-
-
 
 
 };
