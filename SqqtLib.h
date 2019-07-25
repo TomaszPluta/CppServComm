@@ -42,19 +42,6 @@ public:
 
 };
 
-//
-//class Authoriser {
-//public:
-//	std::vector<Client*> clients;
-//	void AddClient(Client* cli){
-//		clients.push_back(cli);
-//	}
-//	bool IsAuthorised(Client * cli){
-//		return true;
-//	}
-//
-//};
-
 
 
 template <class T>
@@ -85,20 +72,6 @@ public:
 	}
 
 };
-
-
-
-//template<class T>
-//class Sender{
-//	T & obj;
-//public:
-//	void Send(std::string msg){
-//		obj<<msg;
-//	}
-//};
-//
-
-
 
 
 template <class T>

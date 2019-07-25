@@ -61,6 +61,7 @@ std:: string querryRes = MySqlConnector.SendQuerry("SELECT * FROM users");
 std::cout << querryRes<<std::endl;
 
 
+std:: string querryResS =  MySqlConnector.SendQuerry("SELECT CustomerName, City FROM Customers");
 
 
     Hqqt::Broker<ServerSocket> broker;
