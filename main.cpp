@@ -19,7 +19,8 @@
 #include <vector>
 
 #include "SqlWrapper.h"
-
+#include "FakeSql.h"
+#include <fstream>
 
 constexpr int ServPort = 1886;
 constexpr int PoolSize = 4;
@@ -54,15 +55,16 @@ std::string GetTimeNow (){
 int main ( int argc, char * argv[] )
 {
 
+    
+FakeSqlWrapper FakeMySqlConnector;
+
+FakeMySqlConnector.SendQuerry("SELECT CustomerName, City FROM Customers");
+
 SqlWrapper MySqlConnector;
 
 MySqlConnector.Connect("localhost","sqqt", "1234","sqqtDB");
 std:: string querryRes = MySqlConnector.SendQuerry("SELECT * FROM users");
 std::cout << querryRes<<std::endl;
-
-
-std:: string querryResS =  MySqlConnector.SendQuerry("SELECT CustomerName, City FROM Customers");
-
 
     Hqqt::Broker<ServerSocket> broker;
     ThreadPool pool(PoolSize);

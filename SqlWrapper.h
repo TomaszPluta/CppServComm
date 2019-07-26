@@ -1,7 +1,7 @@
 #include <mysql.h>
 #include <string>
 
-
+#pragma once
 class SqlWrapper {
     MYSQL _mysql;
     
