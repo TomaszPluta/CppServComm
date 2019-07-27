@@ -4,6 +4,12 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <map>
+
+
+
+
+
 
 class FakeSqlWrapper : public SqlWrapper
 {
@@ -13,6 +19,8 @@ public:
     void Connect(std::string host,  std::string user, std::string password, std::string  dataBase);
     std::string  SendQuerry(std::string querry);
 };
+
+
 
 
 FakeSqlWrapper::FakeSqlWrapper ()
@@ -31,26 +39,21 @@ void FakeSqlWrapper::Connect(std::string host,  std::string user, std::string pa
         std::cerr << "Error: " << e.what();
     }
 
-//    std::string table;
-//     while (dbFile >> table) {
-//        tables.push_back(table);
-//    }
-//    
-//    
 
-//
 
-std::vector<std::string> words;
-std::string currentWord;
+    std::vector<std::string> tables;
+    std::string table;
 
-        while(!dbFile.eof() &&(dbFile >> currentWord)) {
-            words.push_back(currentWord);
-        }
-    for (auto i : words)  //debug
-    {
-        std::cout<<"tables : "<<i<<"in database: " << dataBase << std::endl;
+    while(!dbFile.eof() &&(dbFile >> table)) {
+
+        tables.push_back(table);
     }
-
+    std::cout<<"database in use: " << dataBase<<std::endl;
+    std::cout<<"tables: " << std::endl;
+    for (auto i : tables) { //debug
+        std::cout<< "- "<<i <<std::endl;
+    }
+    std::cout<<std::endl;
 
 }
 
@@ -63,33 +66,36 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
     std::vector<std::string> tokens;
     while(getline(querryStream, token, ' ')) {
         token.erase(std::remove(token.begin(), token.end(), ','), token.end());
-        for (auto & c : token) {
-            c = std::tolower(c);
-                }
-     tokens.push_back(token);
+        tokens.push_back(token);
     }
 
+    std::cout<<"querry tokens nb: "<< tokens.size()<<"\ncontent: "<<std::endl;
+    for (auto i : tokens) { //debug
+        std::cout<<"- "<<i<<std::endl;
+    }
+    std::cout<<std::endl;
 
-            for (auto i : tokens){ //debug
-                std::cout<<"querry tokens nb: "<< tokens.size()<<"content: "<<i<<std::endl;
-            }
-            
-            
-    if (tokens[0] == "select") {
+    if (tokens[0] == "SELECT") {
         std::vector<std::string> columns;
         int i =1;
-        while ((tokens[i] != "from") && (i<tokens.size())) {
+        while ((tokens[i] != "FROM") && (i<tokens.size())) {
             std::string column = tokens[i];
             columns.push_back(column);
             i++;
         }
         i++; //skip keyword "from"
         std::string table = tokens[i];
-        
+
         std::cout<<"table in use: "<<table<<std::endl;
+
+//        auto it =   std::find_if(tables.begin(), tables.end(),[&](std::string tbl) {
+//            std::cout<<i<<std::endl; 
+//            return (tables[i] == table);
+//        });
         
-        auto it =   std::find_if(tables.begin(), tables.end(),[&](std::string tbl) {return (tables[i] == tbl);});
-        if (it != tables.end()) {
+        
+      //  if (it != tables.end()) {
+          if (1){
             std::fstream tableFile;
             tableFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
             try {
@@ -98,21 +104,38 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
                 std::cerr << "Error: " << e.what();
             }
 
-            std::string line;
+            std::string header;
             std::vector<std::string>columns;
-            while (std::getline(tableFile, line, ' ')) {
-                columns.push_back(line);
+            std::getline(tableFile, header) ;
+            std::cout<<header<<std::endl;
+            
+            std::string column;
+            std::stringstream headerStream(header);
+           while(getline(headerStream, column, ' ')) {
+            columns.push_back((column));
+        }
+                     for (auto i : columns) {
+                std::cout<< "- "<<i <<std::endl;
             }
+            
 
-            for (auto i : columns){
-                std::cout<<"selected coulmns: " << i <<std::endl;
-            }
+            
+//            
+//            std::map<int, std::string>;
+//            int ColNb = 0;
+//            for
+            
+ 
+//                while(!tableFile.eof() &&(dbFile >> currentWord)) {
+//            words.push_back(currentWord);
+      //  }
 
+            std::cout<<std::endl;
 
         }
     }
 
-    if (tokens[0] == "insert") {
+    if (tokens[0] == "INSERT") {
         std::vector<std::string> columns;
         int i =1;
         while ((tokens[i] != "into") && (i<tokens.size())) {
@@ -123,3 +146,9 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
 
     }
 }
+
+//
+//
+//            for (auto & c : table) {
+//            c = std::tolower(c); //change to separate func, and use only fo keyword. Create separete func for keywords
+//              }
