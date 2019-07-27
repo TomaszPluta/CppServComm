@@ -57,7 +57,7 @@ int main ( int argc, char * argv[] )
 
     
 FakeSqlWrapper FakeMySqlConnector;
-
+FakeMySqlConnector.Connect("host",  "usr", "pwd", "testDB");
 FakeMySqlConnector.SendQuerry("SELECT CustomerName, City FROM Customers");
 
 SqlWrapper MySqlConnector;

@@ -23,7 +23,7 @@ FakeSqlWrapper::FakeSqlWrapper ()
 
 void FakeSqlWrapper::Connect(std::string host,  std::string user, std::string password, std::string  dataBase)
 {
-    std::fstream dbFile;
+    std::ifstream dbFile;
     dbFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
         dbFile.open(dataBase.c_str(), std::fstream::in | std::fstream::out | std::fstream::app);
@@ -31,9 +31,24 @@ void FakeSqlWrapper::Connect(std::string host,  std::string user, std::string pa
         std::cerr << "Error: " << e.what();
     }
 
-    std::string line;
-    while (std::getline(dbFile, line, ' ')) {
-        tables.push_back(line);
+//    std::string table;
+//     while (dbFile >> table) {
+//        tables.push_back(table);
+//    }
+//    
+//    
+
+//
+
+std::vector<std::string> words;
+std::string currentWord;
+
+        while(!dbFile.eof() &&(dbFile >> currentWord)) {
+            words.push_back(currentWord);
+        }
+    for (auto i : words)  //debug
+    {
+        std::cout<<"tables : "<<i<<"in database: " << dataBase << std::endl;
     }
 
 
@@ -50,10 +65,16 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
         token.erase(std::remove(token.begin(), token.end(), ','), token.end());
         for (auto & c : token) {
             c = std::tolower(c);
-        }
-        tokens.push_back(token);
+                }
+     tokens.push_back(token);
     }
 
+
+            for (auto i : tokens){ //debug
+                std::cout<<"querry tokens nb: "<< tokens.size()<<"content: "<<i<<std::endl;
+            }
+            
+            
     if (tokens[0] == "select") {
         std::vector<std::string> columns;
         int i =1;
@@ -64,6 +85,9 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
         }
         i++; //skip keyword "from"
         std::string table = tokens[i];
+        
+        std::cout<<"table in use: "<<table<<std::endl;
+        
         auto it =   std::find_if(tables.begin(), tables.end(),[&](std::string tbl) {return (tables[i] == tbl);});
         if (it != tables.end()) {
             std::fstream tableFile;
@@ -80,6 +104,9 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
                 columns.push_back(line);
             }
 
+            for (auto i : columns){
+                std::cout<<"selected coulmns: " << i <<std::endl;
+            }
 
 
         }
