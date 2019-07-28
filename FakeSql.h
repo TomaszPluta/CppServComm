@@ -89,13 +89,13 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
         std::cout<<"table in use: "<<table<<std::endl;
 
 //        auto it =   std::find_if(tables.begin(), tables.end(),[&](std::string tbl) {
-//            std::cout<<i<<std::endl; 
+//            std::cout<<i<<std::endl;
 //            return (tables[i] == table);
 //        });
-        
-        
-      //  if (it != tables.end()) {
-          if (1){
+
+
+        //  if (it != tables.end()) {
+        if (1) {
             std::fstream tableFile;
             tableFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
             try {
@@ -107,45 +107,58 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
             std::string header;
             std::vector<std::string>columns;
             std::getline(tableFile, header) ;
-            std::cout<<header<<std::endl;
-            
+            std::cout<<"header: "<<header<<std::endl;
+
             std::string column;
             std::stringstream headerStream(header);
-           while(getline(headerStream, column, ' ')) {
-            columns.push_back((column));
-        }
-                     for (auto i : columns) {
-                std::cout<< "- "<<i <<std::endl;
+            while(getline(headerStream, column, ' ')) {
+                columns.push_back((column));
             }
             
+           std::cout<<"columns: "<<std::endl;
+            for (auto i : columns) {
+                std::cout<< "- "<<i <<std::endl;
+            }
 
-            
-//            
-//            std::map<int, std::string>;
-//            int ColNb = 0;
-//            for
-            
- 
+
+
+//            std::map< int, std::vector<std::string>>columnsContent;
+//            columnsContent[1].push_back("ala");
+            std::vector<std::string> v1;
+            std::vector<std::string> v2;
+
+            std::string s;
+            while(!tableFile.eof() ){
+                for (int i=0; i <columns.size(); i++){
+                    tableFile>>s;
+                       std::cout<<i<<" : "<<std::endl;
+                      std::cout<<s<<std::endl;
+                    if ( i == 1 ){
+                        v1.push_back(s);
+                            std::cout<<"-^^^s^^^^-"<<std::endl;
+                    }
+                    }
+        }
+        
+            std::cout<<"column 1:"<<std::endl;
+            for (auto i : v1){
+                std::cout<<i<<std::endl;
+            }
+}
+
+
+
+
 //                while(!tableFile.eof() &&(dbFile >> currentWord)) {
 //            words.push_back(currentWord);
-      //  }
+            //  }
 
             std::cout<<std::endl;
 
         }
     }
 
-    if (tokens[0] == "INSERT") {
-        std::vector<std::string> columns;
-        int i =1;
-        while ((tokens[i] != "into") && (i<tokens.size())) {
-            std::string column = tokens[i];
-            columns.push_back(column);
-            i++;
-        }
-
-    }
-}
+ 
 
 //
 //
