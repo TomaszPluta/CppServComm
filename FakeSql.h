@@ -74,13 +74,13 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
         std::cout<<"- "<<i<<std::endl;
     }
     std::cout<<std::endl;
-
+            std::string res;
     if (tokens[0] == "SELECT") {
-        std::vector<std::string> columns;
+        std::vector<std::string> columnsQuerry;
         int i =1;
         while ((tokens[i] != "FROM") && (i<tokens.size())) {
             std::string column = tokens[i];
-            columns.push_back(column);
+            columnsQuerry.push_back(column);
             i++;
         }
         i++; //skip keyword "from"
@@ -105,63 +105,57 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
             }
 
             std::string header;
-            std::vector<std::string>columns;
+            std::vector<std::string>columnsFile;
             std::getline(tableFile, header) ;
             std::cout<<"header: "<<header<<std::endl;
 
             std::string column;
             std::stringstream headerStream(header);
-            while(getline(headerStream, column, ' ')) {
-                columns.push_back((column));
+            while(getline(headerStream, column, ',')) {
+                columnsFile.push_back((column));
             }
             
            std::cout<<"columns: "<<std::endl;
-            for (auto i : columns) {
+            for (auto i : columnsFile) {
                 std::cout<< "- "<<i <<std::endl;
             }
+             std::cout<<std::endl;
+            
+            
+            std::vector<int> clmnsNb;
+            for (int i =0 ; i < columnsFile.size(); i++)
+            {
+                if (find (columnsFile.begin(), columnsFile.end(), columnsQuerry[i]) != columnsFile.end()) {
+                    clmnsNb.push_back(i);
+                }
+            }
+    
 
-
-
-//            std::map< int, std::vector<std::string>>columnsContent;
-//            columnsContent[1].push_back("ala");
-            std::vector<std::string> v1;
-            std::vector<std::string> v2;
-
-            std::string s;
-            while(!tableFile.eof() ){
-                for (int i=0; i <columns.size(); i++){
-                    tableFile>>s;
-                       std::cout<<i<<" : "<<std::endl;
-                      std::cout<<s<<std::endl;
-                    if ( i == 1 ){
-                        v1.push_back(s);
-                            std::cout<<"-^^^s^^^^-"<<std::endl;
+            std::cout<<"here:"<<std::endl;
+            
+            
+            std::string line;
+            while((!tableFile.eof()  && getline(tableFile, line)))
+            {
+                int i = 0;
+                std::stringstream ss(line);
+                std::string field;
+                while(getline(ss, field, ',')) {
+                    i++;
+                    if ( (std::find(clmnsNb.begin(), clmnsNb.end(), i) !=clmnsNb.end())) {
+                        res += field + " ";
                     }
-                    }
-        }
-        
-            std::cout<<"column 1:"<<std::endl;
-            for (auto i : v1){
-                std::cout<<i<<std::endl;
+                }
+            }
+          
+          
+
+            std::cout<<"result:"<<std::endl<<res<<std::endl;
+            
+            
+                     std::cout<<std::endl;
+            
+            }
+                     return res;
             }
 }
-
-
-
-
-//                while(!tableFile.eof() &&(dbFile >> currentWord)) {
-//            words.push_back(currentWord);
-            //  }
-
-            std::cout<<std::endl;
-
-        }
-    }
-
- 
-
-//
-//
-//            for (auto & c : table) {
-//            c = std::tolower(c); //change to separate func, and use only fo keyword. Create separete func for keywords
-//              }
