@@ -123,16 +123,15 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
             
             
             std::vector<int> clmnsNb;
-            for (int i =0 ; i < columnsFile.size(); i++)
+            for (int i =0 ; i < columnsQuerry.size(); i++)
             {
-                if (find (columnsFile.begin(), columnsFile.end(), columnsQuerry[i]) != columnsFile.end()) {
-                    clmnsNb.push_back(i);
-                }
+                  for (int j =0 ;j < columnsFile.size(); j++){
+                    if (columnsFile[j] == columnsQuerry[i]) {
+                        clmnsNb.push_back(j);
+                    }
+                  }
             }
     
-
-            std::cout<<"here:"<<std::endl;
-            
             
             std::string line;
             while((!tableFile.eof()  && getline(tableFile, line)))
@@ -141,11 +140,12 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
                 std::stringstream ss(line);
                 std::string field;
                 while(getline(ss, field, ',')) {
-                    i++;
                     if ( (std::find(clmnsNb.begin(), clmnsNb.end(), i) !=clmnsNb.end())) {
                         res += field + " ";
                     }
+                     i++;
                 }
+                res +=  "\n";
             }
           
           
