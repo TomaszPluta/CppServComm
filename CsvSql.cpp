@@ -1,4 +1,4 @@
-#include <SqlWrapper.h>
+#include <CsvSql.h>
 #include <sstream>
 #include <vector>
 #include <algorithm>
@@ -8,28 +8,13 @@
 
 
 
-
-
-
-class FakeSqlWrapper : public SqlWrapper
-{
-    std::vector<std::string> tables;
-public:
-    FakeSqlWrapper ();
-    void Connect(std::string host,  std::string user, std::string password, std::string  dataBase);
-    std::string  SendQuerry(std::string querry);
-};
-
-
-
-
-FakeSqlWrapper::FakeSqlWrapper ()
+CsvSql::CsvSql ()
 {
 
 
 }
 
-void FakeSqlWrapper::Connect(std::string host,  std::string user, std::string password, std::string  dataBase)
+void CsvSql::Connect(std::string host,  std::string user, std::string password, std::string  dataBase)
 {
     std::ifstream dbFile;
     dbFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -59,7 +44,7 @@ void FakeSqlWrapper::Connect(std::string host,  std::string user, std::string pa
 
 
 
-std::string  FakeSqlWrapper::SendQuerry(std::string querry)
+std::string  CsvSql::SendQuerry(std::string querry)
 {
     std::stringstream querryStream (querry);
     std::string token;
@@ -88,13 +73,7 @@ std::string  FakeSqlWrapper::SendQuerry(std::string querry)
 
         std::cout<<"table in use: "<<table<<std::endl;
 
-//        auto it =   std::find_if(tables.begin(), tables.end(),[&](std::string tbl) {
-//            std::cout<<i<<std::endl;
-//            return (tables[i] == table);
-//        });
 
-
-        //  if (it != tables.end()) {
         if (1) {
             std::fstream tableFile;
             tableFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);

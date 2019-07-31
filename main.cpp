@@ -19,7 +19,6 @@
 #include <vector>
 
 #include "SqlWrapper.h"
-#include "FakeSql.h"
 #include <fstream>
 
 constexpr int ServPort = 1886;
@@ -54,12 +53,6 @@ std::string GetTimeNow (){
 
 int main ( int argc, char * argv[] )
 {
-
-    
-FakeSqlWrapper FakeMySqlConnector;
-FakeMySqlConnector.Connect("host",  "usr", "pwd", "testDB");
-FakeMySqlConnector.SendQuerry("SELECT CustomerName, City FROM Customers");
-
 SqlWrapper MySqlConnector;
 
 MySqlConnector.Connect("localhost","sqqt", "1234","sqqtDB");
