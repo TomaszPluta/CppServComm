@@ -9,14 +9,15 @@
 #include <chrono>
 #include <ctime> 
 #include <cassert>
-
+#include <utility>
 #include <mysql.h>
 
 #include <iostream>
 #include <memory>
 #include <string>
-#include <tuple>
 #include <vector>
+#include "queue"
+#include "SqttClient.h"
 
 #include "SqlWrapper.h"
 #include <fstream>
@@ -25,23 +26,44 @@ constexpr int ServPort = 1886;
 constexpr int PoolSize = 4;
 constexpr int ColumnNo = 3;
 
+std::queue <std::pair <std::string, SqttClient *>> msgQueue;
+std::mutex msgMutex;
+std::unique_lock<std::mutex>msgLock(msgMutex);
 
-auto WorkerThread = [&] ( ServerSocket new_sock ,  Hqqt::Broker<ServerSocket> &broker)
+
+auto WorkerThread = [&] ( ServerSocket new_sock ,  Hqqt::Broker<SqttClient> &broker)
 {
     try {
+        SqttClient * socketCli = new ClientSocket(new_sock);
         while (1) {
             std::cout << "child process here:" << std::endl;
             std::string frame;
             new_sock >> frame;
             std::cout << "Server got:" << frame <<std::endl;
             std::cout << "from peer addr: " << new_sock.get_cli_addr() <<std::endl;
-            new_sock << broker.OnReceivedFrame(frame, new_sock);
+            msgLock.lock();
+            
+            msgQueue.push(std::make_pair(frame, socketCli));
+            
         }
     } catch (...) {
         std::cout<<"client closed connection"<<std::endl;
         exit(0);
     }
 };
+
+
+auto brokerThread = [&] (Hqqt::Broker<SqttClient> &broker)
+{
+    msgLock.lock();
+    while(msgQueue.empty());
+    auto msgCli = msgQueue.front();
+    msgQueue.pop();
+    broker.OnReceivedFrame(msgCli.first, msgCli.second);
+};
+
+
+
 
 std::string GetTimeNow (){
      std::chrono::system_clock::time_point timeNow  = std::chrono::system_clock::now();
@@ -59,7 +81,7 @@ MySqlConnector.Connect("localhost","sqqt", "1234","sqqtDB");
 std:: string querryRes = MySqlConnector.SendQuerry("SELECT * FROM users");
 std::cout << querryRes<<std::endl;
 
-    Hqqt::Broker<ServerSocket> broker;
+    Hqqt::Broker<SqttClient> broker;
     ThreadPool pool(PoolSize);
     ServerSocket server ( ServPort );
     std::cout << "Server is running...."<<std::endl;

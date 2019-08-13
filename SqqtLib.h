@@ -28,7 +28,7 @@ class Client{
 	T & _obj;
 
 public:
-	Client(T &obj): _obj(obj){};
+	Client(T *obj): _obj(obj){};
 	std::string addr; ///prv
 
 	void Send (Msg msg){
@@ -38,7 +38,6 @@ public:
 	void Update(Msg msg){
 		_obj << msg;
 	}
-
 
 };
 
@@ -99,7 +98,7 @@ class Broker{
 public:
 	std::vector <Topic<T>*> topics;
 
-	std::string OnReceivedFrame(const std::string& frame, T& senderObj){
+	std::string OnReceivedFrame(const std::string frame, T* senderObj){
 
 		std::stringstream frameStream(frame);
 		std::string token;
@@ -129,14 +128,14 @@ public:
 	}
 
 
-	void AddSubscription(std::string topicId, T &obj){
-		Topic<T> * topic =  GetTopicById(topicId); //opaque with lines below
-		if (topic == nullptr){
-			topic = new Topic<T>(topicId);
-			topics.push_back(topic);
-		}
-		Client<T> * cli = new Client<T>(obj);
-		topic->Attach(cli);
+	void AddSubscription(std::string topicId, T *obj){
+//		Topic<T> * topic =  GetTopicById(topicId); //opaque with lines below
+//		if (topic == nullptr){
+//			topic = new Topic<T>(topicId);
+//			topics.push_back(topic);
+//		}
+//		Client<T> * cli = new Client<T>(obj);
+//		topic->Attach(cli);
 
 	}
 
