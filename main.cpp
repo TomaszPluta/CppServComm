@@ -22,13 +22,13 @@
 #include "SqlWrapper.h"
 #include <fstream>
 
+#include "SharedQueue.h"
 constexpr int ServPort = 1886;
 constexpr int PoolSize = 4;
 constexpr int ColumnNo = 3;
 
-std::queue <std::pair <std::string, SqttClient *>> msgQueue;
-std::mutex msgMutex;
-std::unique_lock<std::mutex>msgLock(msgMutex);
+SharedQueue <std::pair <std::string, SqttClient *>> msgQueue;
+
 
 
 auto WorkerThread = [&] ( ServerSocket new_sock ,  Hqqt::Broker<SqttClient> &broker)
@@ -41,10 +41,10 @@ auto WorkerThread = [&] ( ServerSocket new_sock ,  Hqqt::Broker<SqttClient> &bro
             new_sock >> frame;
             std::cout << "Server got:" << frame <<std::endl;
             std::cout << "from peer addr: " << new_sock.get_cli_addr() <<std::endl;
-            msgLock.lock();
+
+            msgQueue.Push(std::make_pair(frame, socketCli));
             
-            msgQueue.push(std::make_pair(frame, socketCli));
-            
+            std::cout << "msg pushed"<<std::endl;
         }
     } catch (...) {
         std::cout<<"client closed connection"<<std::endl;
@@ -53,13 +53,14 @@ auto WorkerThread = [&] ( ServerSocket new_sock ,  Hqqt::Broker<SqttClient> &bro
 };
 
 
-auto brokerThread = [&] (Hqqt::Broker<SqttClient> &broker)
+auto BrokerThread = [&] (Hqqt::Broker<SqttClient> &broker)
 {
-    msgLock.lock();
-    while(msgQueue.empty());
-    auto msgCli = msgQueue.front();
-    msgQueue.pop();
-    broker.OnReceivedFrame(msgCli.first, msgCli.second);
+    std::cout << "broker thread active"<<std::endl;
+         auto msgCli  = msgQueue.Front();
+        msgQueue.Pop();
+        std::cout << "msg poped"<<std::endl;
+        broker.OnReceivedFrame(msgCli.first, msgCli.second);
+    
 };
 
 
@@ -81,8 +82,10 @@ MySqlConnector.Connect("localhost","sqqt", "1234","sqqtDB");
 std:: string querryRes = MySqlConnector.SendQuerry("SELECT * FROM users");
 std::cout << querryRes<<std::endl;
 
-    Hqqt::Broker<SqttClient> broker;
     ThreadPool pool(PoolSize);
+    Hqqt::Broker<SqttClient> broker;
+     pool.enqueue(BrokerThread, std::ref(broker));
+
     ServerSocket server ( ServPort );
     std::cout << "Server is running...."<<std::endl;
 

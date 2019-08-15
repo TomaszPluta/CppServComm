@@ -29,10 +29,10 @@ public:
 
 
 class ClientSocket : public SqttClient{
-        ServerSocket _socket;
+        ServerSocket & _socket;
 public:
 
- ClientSocket(ServerSocket socket) : _socket {socket}{};
+ ClientSocket(ServerSocket &socket) : _socket {socket}{};
  
     void Send (Msg msg) {
         _socket<<msg;
