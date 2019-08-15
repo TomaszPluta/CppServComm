@@ -9,6 +9,7 @@
 #include <sstream>
 #include <chrono>
 
+#include "SqttClientItf.h"
 
 namespace Hqqt{
     
@@ -23,30 +24,10 @@ using Msg = std::string;
 
 
 
-template <class T>
-class Client{
-	T & _obj;
 
-public:
-	Client(T *obj): _obj(obj){};
-	std::string addr; ///prv
-
-	void Send (Msg msg){
-		_obj << msg;
-	}
-
-	void Update(Msg msg){
-		_obj << msg;
-	}
-
-};
-
-
-
-template <class T>
 class Topic{
 
-	std::vector <Client<T> *> clients;
+	std::vector <Client*> clients;
 
 public:
 	Topicid _id;
@@ -55,12 +36,12 @@ public:
 		_id = id;
 	}
 
-	void Attach (Client<T>* cli){
+	void Attach (Client* cli){
 		clients.push_back(cli);
 	}
 
-	void Detach (Client<T>* cli){
-		clients.push_back(cli);
+	void Detach (Client* cli){
+		clients.erase(std::remove_if(clients.begin(), clients.end(), [&](Client *c){return(c->GetAddr()==cli->GetAddr());}), clients.end());
 	}
 
 	void Notify(std::string msg){
@@ -80,12 +61,12 @@ class Broker{
 
 
 	void AddTopic(std::string topicId){
-		Topic<T>  * topic= new Topic<T>(topicId);
+		Topic  * topic= new Topic(topicId);
 		topics.push_back(topic);
 	}
 
-	Topic<T> * GetTopicById(Topicid id){
-		auto it = std::find_if(topics.begin(), topics.end(), [&](Topic<T> * topic){return (topic->_id  == id);});
+	Topic * GetTopicById(Topicid id){
+		auto it = std::find_if(topics.begin(), topics.end(), [&](Topic * topic){return (topic->_id  == id);});
 		if (it != topics.end()){
 			return *it;
 		} else {
@@ -96,7 +77,7 @@ class Broker{
 
 
 public:
-	std::vector <Topic<T>*> topics;
+	std::vector <Topic*> topics;
 
 	std::string OnReceivedFrame(const std::string frame, T* senderObj){
 
@@ -110,7 +91,7 @@ public:
 		}
 
 
-		constexpr   int Head = 0; //convert vector to map
+		constexpr   int Head = 0;
 		constexpr   int Topic = 1;
 		constexpr   int Msg = 2;
 
@@ -128,24 +109,22 @@ public:
 	}
 
 
-	void AddSubscription(std::string topicId, T *obj){
-//		Topic<T> * topic =  GetTopicById(topicId); //opaque with lines below
-//		if (topic == nullptr){
-//			topic = new Topic<T>(topicId);
-//			topics.push_back(topic);
-//		}
-//		Client<T> * cli = new Client<T>(obj);
-//		topic->Attach(cli);
-
+	void AddSubscription(std::string topicId, Client *cli){
+		Topic * topic =  GetTopicById(topicId); //make more verbose: "get topic, if not, create one"
+		if (topic == nullptr){
+			topic = new Topic(topicId);
+			topics.push_back(topic);
+		}
+		topic->Attach(cli);
 	}
 
 
 
 
 	void Publish (std::string topicId, std::string msg){
-		Topic<T> * topic = GetTopicById(topicId);
+		Topic * topic = GetTopicById(topicId);
 		if (topic == nullptr){
-					topic = new Topic<T>(topicId);
+					topic = new Topic(topicId);
 				}
 			topic->Notify(msg);
 	}

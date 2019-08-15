@@ -17,8 +17,8 @@
 #include <string>
 #include <vector>
 #include "queue"
-#include "SqttClient.h"
 
+#include "SqttClientItf.h"
 #include "SqlWrapper.h"
 #include <fstream>
 
@@ -27,11 +27,11 @@ constexpr int ServPort = 1886;
 constexpr int PoolSize = 4;
 constexpr int ColumnNo = 3;
 
-SharedQueue <std::pair <std::string, SqttClient *>> msgQueue;
+SharedQueue <std::pair <std::string, Hqqt::Client *>> msgQueue;
 
 
 
-auto WorkerThread = [&] ( ServerSocket new_sock ,  Hqqt::Broker<SqttClient> &broker)
+auto WorkerThread = [&] ( ServerSocket new_sock ,  Hqqt::Broker &broker)
 {
     try {
         SqttClient * socketCli = new ClientSocket(new_sock);

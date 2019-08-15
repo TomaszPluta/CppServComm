@@ -8,24 +8,11 @@
 #include <functional>
 #include <sstream>
 
-
+#include "SqttClientItf.h"
 #include "serv.h"
 #include "SocketException.h"
 
 using Msg = std::string;
-
-class SqttClient{
-	std::string addr;
-public:
-	virtual void Send (Msg msg) = 0;
-	virtual void Update(Msg msg) =0;
-    
-   SqttClient & operator<<(Msg msg){
-        Send(msg);
-    }
-};
-
-
 
 
 class ClientSocket : public SqttClient{
