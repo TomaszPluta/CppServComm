@@ -12,10 +12,11 @@
 #include "serv.h"
 #include "SocketException.h"
 
+namespace Hqqt{
 using Msg = std::string;
 
 
-class ClientSocket : public SqttClient{
+class ClientSocket : public Client{
         ServerSocket & _socket;
 public:
 
@@ -32,7 +33,7 @@ public:
 };
 
 
-class ClientDebug : public SqttClient{
+class ClientDebug : public Client{
 public:
     void Send (Msg msg) {
         std::cout<<msg;
@@ -42,3 +43,4 @@ public:
     }
 };
 
+}

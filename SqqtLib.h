@@ -26,11 +26,10 @@ using Msg = std::string;
 
 
 class Topic{
-
 	std::vector <Client*> clients;
 
 public:
-	Topicid _id;
+	Topicid _id;///dbg
 
 	Topic(std::string id){
 		_id = id;
@@ -53,12 +52,7 @@ public:
 
 };
 
-
-template <class T>
 class Broker{
-
-	//set instead to avoid duplications?
-
 
 	void AddTopic(std::string topicId){
 		Topic  * topic= new Topic(topicId);
@@ -79,7 +73,7 @@ class Broker{
 public:
 	std::vector <Topic*> topics;
 
-	std::string OnReceivedFrame(const std::string frame, T* senderObj){
+	std::string OnReceivedFrame(const std::string frame, Client* cli){
 
 		std::stringstream frameStream(frame);
 		std::string token;
@@ -96,7 +90,7 @@ public:
 		constexpr   int Msg = 2;
 
 		if(tokenList[Head] == "subscribe"){ //map
-			AddSubscription(tokenList[Topic], senderObj);
+			AddSubscription(tokenList[Topic], cli);
 			return "subscribe ok";
 		}
 

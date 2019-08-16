@@ -19,6 +19,7 @@
 #include "queue"
 
 #include "SqttClientItf.h"
+#include "SqttClientsImpl.h"
 #include "SqlWrapper.h"
 #include <fstream>
 
@@ -31,20 +32,17 @@ SharedQueue <std::pair <std::string, Hqqt::Client *>> msgQueue;
 
 
 
-auto WorkerThread = [&] ( ServerSocket new_sock ,  Hqqt::Broker &broker)
+auto WorkerThread = [&] ( ServerSocket new_sock )
 {
     try {
-        SqttClient * socketCli = new ClientSocket(new_sock);
+            Hqqt::Client * socketCli = new Hqqt::ClientSocket(new_sock);
         while (1) {
             std::cout << "child process here:" << std::endl;
             std::string frame;
             new_sock >> frame;
             std::cout << "Server got:" << frame <<std::endl;
             std::cout << "from peer addr: " << new_sock.get_cli_addr() <<std::endl;
-
             msgQueue.Push(std::make_pair(frame, socketCli));
-            
-            std::cout << "msg pushed"<<std::endl;
         }
     } catch (...) {
         std::cout<<"client closed connection"<<std::endl;
@@ -52,8 +50,30 @@ auto WorkerThread = [&] ( ServerSocket new_sock ,  Hqqt::Broker &broker)
     }
 };
 
+//
+//auto WorkerThread = [&] ( Hqqt::Broker &broker)
+//{
+//    try {
+//         Hqqt::Client * socketCli = new    Hqqt::ClientSocket(new_sock);
+//        while (1) {
+//            std::cout << "child process here:" << std::endl;
+//            std::string frame;
+//            new_sock >> frame;
+//            std::cout << "Server got:" << frame <<std::endl;
+//            std::cout << "from peer addr: " << new_sock.get_cli_addr() <<std::endl;
+//
+//            msgQueue.Push(std::make_pair(frame, socketCli));
+//            
+//            std::cout << "msg pushed"<<std::endl;
+//        }
+//    } catch (...) {
+//        std::cout<<"client closed connection"<<std::endl;
+//        exit(0);
+//    }
+//};
 
-auto BrokerThread = [&] (Hqqt::Broker<SqttClient> &broker)
+
+auto BrokerThread = [&] (Hqqt::Broker &broker)
 {
     std::cout << "broker thread active"<<std::endl;
          auto msgCli  = msgQueue.Front();
@@ -83,7 +103,7 @@ std:: string querryRes = MySqlConnector.SendQuerry("SELECT * FROM users");
 std::cout << querryRes<<std::endl;
 
     ThreadPool pool(PoolSize);
-    Hqqt::Broker<SqttClient> broker;
+    Hqqt::Broker broker;
      pool.enqueue(BrokerThread, std::ref(broker));
 
     ServerSocket server ( ServPort );
@@ -98,7 +118,7 @@ std::cout << querryRes<<std::endl;
         std:: string querryRes3 = MySqlConnector.SendQuerry("SELECT * FROM users");
         std::cout << querryRes3<<std::endl;
         CliCntr++;
-      pool.enqueue(WorkerThread, std::ref(*cliSocket), std::ref(broker));
+      pool.enqueue(WorkerThread, std::ref(*cliSocket));
     }
 
 
