@@ -50,37 +50,18 @@ auto WorkerThread = [&] ( ServerSocket new_sock )
     }
 };
 
-//
-//auto WorkerThread = [&] ( Hqqt::Broker &broker)
-//{
-//    try {
-//         Hqqt::Client * socketCli = new    Hqqt::ClientSocket(new_sock);
-//        while (1) {
-//            std::cout << "child process here:" << std::endl;
-//            std::string frame;
-//            new_sock >> frame;
-//            std::cout << "Server got:" << frame <<std::endl;
-//            std::cout << "from peer addr: " << new_sock.get_cli_addr() <<std::endl;
-//
-//            msgQueue.Push(std::make_pair(frame, socketCli));
-//            
-//            std::cout << "msg pushed"<<std::endl;
-//        }
-//    } catch (...) {
-//        std::cout<<"client closed connection"<<std::endl;
-//        exit(0);
-//    }
-//};
+
 
 
 auto BrokerThread = [&] (Hqqt::Broker &broker)
 {
+    while (1){
     std::cout << "broker thread active"<<std::endl;
          auto msgCli  = msgQueue.Front();
         msgQueue.Pop();
-        std::cout << "msg poped"<<std::endl;
+        std::cout << "broker got msg"<<std::endl;
         broker.OnReceivedFrame(msgCli.first, msgCli.second);
-    
+    }
 };
 
 
@@ -100,7 +81,7 @@ SqlWrapper MySqlConnector;
 
 MySqlConnector.Connect("localhost","sqqt", "1234","sqqtDB");
 std:: string querryRes = MySqlConnector.SendQuerry("SELECT * FROM users");
-std::cout << querryRes<<std::endl;
+//std::cout << querryRes<<std::endl;
 
     ThreadPool pool(PoolSize);
     Hqqt::Broker broker;
@@ -115,8 +96,8 @@ std::cout << querryRes<<std::endl;
       server.accept (*cliSocket );
      
         MySqlConnector.SendQuerry("INSERT INTO users (id, status, timeLogin) VALUES ('"+std::string(cliSocket->get_cli_addr())+"', '"+std::to_string(CliCntr)+"', '"+GetTimeNow()+"')");
-        std:: string querryRes3 = MySqlConnector.SendQuerry("SELECT * FROM users");
-        std::cout << querryRes3<<std::endl;
+  //      std:: string querryRes3 = MySqlConnector.SendQuerry("SELECT * FROM users");
+   //     std::cout << querryRes3<<std::endl;
         CliCntr++;
       pool.enqueue(WorkerThread, std::ref(*cliSocket));
     }
