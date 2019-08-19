@@ -24,6 +24,10 @@
 #include <fstream>
 
 #include "SharedQueue.h"
+
+#include "email.h"
+#include "/home/tomek/credraspbmail.crd"
+
 constexpr int ServPort = 1886;
 constexpr int PoolSize = 4;
 constexpr int ColumnNo = 3;
@@ -75,8 +79,45 @@ std::string GetTimeNow (){
 }
 
 
+
+void Mailtest(void){
+    
+Email e;
+	int curlError = 0;
+	// e.dump();
+
+	e.setTo(mail_destination);
+	e.setFrom("mail.raspberry.smtp@gmail.com");
+	e.setSubject("hello world");
+	e.setCc("");
+	e.setBody("My test email from my app");
+
+	e.setSMTP_host("smtps://smtp.gmail.com:465");
+	e.setSMTP_username(mail_login);
+	e.setSMTP_password(mail_password);
+
+	e.constructEmail();
+	e.dump();
+
+	curlError = e.send();
+
+	if (curlError){
+		std::cout << "Error sending email!" << std::endl;
+	}
+
+	else{
+		std::cout << "Email sent successfully!" << std::endl;
+	}
+}
+
+
+
 int main ( int argc, char * argv[] )
 {
+    
+    Mailtest();
+    
+    
 SqlWrapper MySqlConnector;
 
 MySqlConnector.Connect("localhost","sqqt", "1234","sqqtDB");
@@ -89,6 +130,9 @@ std:: string querryRes = MySqlConnector.SendQuerry("SELECT * FROM users");
 
     ServerSocket server ( ServPort );
     std::cout << "Server is running...."<<std::endl;
+
+
+
 
     int CliCntr;
     while(1) {
@@ -105,6 +149,9 @@ std:: string querryRes = MySqlConnector.SendQuerry("SELECT * FROM users");
 
 
     std::cout << "Server end"<<std::endl;
+    
+    
+	
     return 0;
 }
 
