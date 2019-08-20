@@ -78,7 +78,44 @@ std::string GetTimeNow (){
      return tNow;
 }
 
+std::string fetchdata;
 
+size_t write_data(char* buf, size_t size, size_t nmemb, void* up) {
+    fetchdata.append((char*)buf, size*nmemb);
+    return size*nmemb;
+}
+
+int fetchmail() {
+    CURL *curl;
+    CURLcode res = CURLE_OK;
+
+    curl = curl_easy_init();
+    if(curl) {
+        curl_easy_setopt(curl, CURLOPT_USERNAME, mail_login);
+        curl_easy_setopt(curl, CURLOPT_PASSWORD, mail_password);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+
+        curl_easy_setopt(curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX");
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "UID FETCH 1 BODY[HEADER.FIELDS (To)]");
+
+        res = curl_easy_perform(curl);
+
+        if(res != CURLE_OK)
+            fprintf(stderr, "curl_easy_perform() failed: %s\n",
+
+        curl_easy_strerror(res));        
+        curl_easy_cleanup(curl);
+    }
+
+    std::ofstream outfile("fetched.txt", std::ios_base::app);
+    outfile << fetchdata;
+    outfile.close();
+
+    return (int)res;
+}
 
 void Mailtest(void){
     
@@ -114,8 +151,8 @@ Email e;
 
 int main ( int argc, char * argv[] )
 {
-    
-    Mailtest();
+    fetchmail();
+   //// Mailtest();
     
     
 SqlWrapper MySqlConnector;
