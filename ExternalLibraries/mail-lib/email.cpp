@@ -7,7 +7,6 @@
 #include <ctime>
 #include <string.h>
 
-// #include "stdafx.h"
 #include "email.h"
 
 #define MAX_LEN 255 // this must be divisible by 3 otherwise the SMTP server won't be able to decode the attachment properly
@@ -22,11 +21,8 @@
 #define END_OF_TRANSMISSION_BOUNDARY 15
 #define END_OF_TRANSMISSION 16
 
-#ifdef WINDOWS_H
-	#define DIR_CHAR '\\'
-#else
-	#define DIR_CHAR '/'
-#endif
+#define DIR_CHAR '/'
+
 
 using namespace std;
 
@@ -74,52 +70,52 @@ static const char *email_template[] = {
 	NULL
 };
 
-Email::Email()
+EmailSender::EmailSender()
 {
 	// empty constructor
 }
 
-void Email::setTo(const string to)
+void EmailSender::setTo(const string to)
 {
 	this->to = to;
 }
 
-void Email::setFrom(const string from)
+void EmailSender::setFrom(const string from)
 {
 	this->from = from;
 }
 
-void Email::setCc(const string cc)
+void EmailSender::setCc(const string cc)
 {
 	this->cc = cc;
 }
 
-void Email::setSubject(const string subject)
+void EmailSender::setSubject(const string subject)
 {
 	this->subject = subject;
 }
 
-void Email::setBody(const string body)
+void EmailSender::setBody(const string body)
 {
 	this->body = body;
 }
 
-void Email::setSMTP_username(const string user)
+void EmailSender::setSMTP_username(const string user)
 {
 	this->smtp_user = user;
 }
 
-void Email::setSMTP_password(const string pass)
+void EmailSender::setSMTP_password(const string pass)
 {
 	this->smtp_password = pass;
 }
 
-void Email::setSMTP_host(const string hostname)
+void EmailSender::setSMTP_host(const string hostname)
 {
 	this->smtp_host = hostname;
 }
 
-void Email::addAttachment(const string file_path)
+void EmailSender::addAttachment(const string file_path)
 {
 	FILE *fp = NULL;
 	char buffer[MAX_LEN + 1] = { 0 };
@@ -213,7 +209,7 @@ void Email::addAttachment(const string file_path)
 	}
 }
 
-void Email::constructEmail(void)
+void EmailSender::constructEmail(void)
 {
 	int i = 0;
 	char buffer[MAX_LEN];
@@ -296,7 +292,7 @@ void Email::constructEmail(void)
 	This function was taken and modified from:
 	https://curl.haxx.se/libcurl/c/smtp-ssl.html
 */
-int Email::send(void) const
+int EmailSender::send(void) const
 {
 	CURL *curl;
 	CURLcode res = CURLE_OK;
@@ -389,18 +385,18 @@ int Email::send(void) const
 	return (int)res;
 }
 
-void Email::removeAllAttachments()
+void EmailSender::removeAllAttachments()
 {
 	this->attachments.clear();
 }
 
-void Email::clearEmailContents()
+void EmailSender::clearEmailContents()
 {
 	this->email_contents.clear();
 	this->attachments.clear();
 }
 
-void Email::dump(void) const
+void EmailSender::dump(void) const
 {
 	int i = 0;
 
