@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 
+#include "/home/tomek/credraspbmail.crd"
+
 #define LINUX_H
 
 class EmailSender
@@ -44,47 +46,69 @@ private:
 	int numberOfLines;
 };
 
- /*
-***
-  */
-
-
-size_t write_data(char* buf, size_t size, size_t nmemb, void* up) {
-    std::string fetchdata;
-    fetchdata.append((char*)buf, size*nmemb);
-    std::cout<<fetchdata<<std::endl;
-    return size * nmemb;
-}
-
-
-class EmailReceiver{
+class Inbox{
 private:
         CURL *_curl;
         std::string _user;
         std::string _pwd;
         std::string _url;
 public:
-EmailReceiver( std::string user,  std::string pwd, std::string inboxUrl) : _user(user), _pwd(pwd), _url(inboxUrl) {
-     _curl = curl_easy_init();
+    
+static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
+{
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
 }
 
-int FetchMail() {
-        curl_easy_setopt(_curl, CURLOPT_USERNAME, _user);
-        curl_easy_setopt(_curl, CURLOPT_PASSWORD, _pwd);
-        curl_easy_setopt(_curl, CURLOPT_SSL_VERIFYPEER, 0L);
-        curl_easy_setopt(_curl, CURLOPT_SSL_VERIFYHOST, 0L);
-        curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, write_data);
-        curl_easy_setopt(_curl, CURLOPT_VERBOSE, 1L);
+  std::string readBuffer;
 
-        curl_easy_setopt(_curl, CURLOPT_URL, _url);
-        curl_easy_setopt(_curl, CURLOPT_CUSTOMREQUEST, "UID FETCH 1 BODY[HEADER.FIELDS (To)]");
+    
+    
+    Inbox( std::string user,  std::string pwd, std::string inboxUrl) : _user(user), _pwd(pwd), _url(inboxUrl){
+        _curl = curl_easy_init();
+        curl_easy_setopt(_curl, CURLOPT_USERNAME, _user.c_str());
+        curl_easy_setopt(_curl, CURLOPT_PASSWORD, _pwd.c_str());
+//        curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, write_data);
+        curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(_curl, CURLOPT_WRITEDATA, &readBuffer);
+        curl_easy_setopt(_curl, CURLOPT_SSL_VERIFYHOST, 0L);
+        curl_easy_setopt(_curl, CURLOPT_SSL_VERIFYPEER, 0L);
+        curl_easy_setopt(_curl, CURLOPT_VERBOSE, 0L);
+        
+
+    }
+    
+    ~Inbox()    {
+     curl_easy_cleanup(_curl);
+}
+
+
+
+int GetMailNumber() {
+        curl_easy_setopt(_curl, CURLOPT_VERBOSE, 1L);
+        curl_easy_setopt(_curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX?NEW"); 
+        CURLcode res = curl_easy_perform(_curl);
+       std::cout << readBuffer << std::endl;
+        if(res != CURLE_OK){
+            std::cout<< "curl_easy_perform() failed: %s\n"<< curl_easy_strerror(res)<<std::endl;
+        }
+    return (int)res;
+};
+
+
+
+ 
+
+
+int FetchMail() {
+       curl_easy_setopt(_curl, CURLOPT_VERBOSE, 1L);
+       curl_easy_setopt(_curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX/;UID=5/;SECTION=TEXT"); //_url + opta /optb + mail nb as arg
 
         CURLcode res = curl_easy_perform(_curl);
-
+        std::cout << readBuffer << std::endl;
         if(res != CURLE_OK){
-            std::cout<< "curl_easy_perform() failed: %s\n"<<std::endl;
+            std::cout<< "curl_easy_perform() failed: %s\n"<< curl_easy_strerror(res)<<std::endl;
         }
-        curl_easy_cleanup(_curl);
 
     return (int)res;
 }

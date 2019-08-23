@@ -80,10 +80,8 @@ std::string GetTimeNow (){
 
 std::string fetchdata;
 
-size_t write_data(char* buf, size_t size, size_t nmemb, void* up) {
-    fetchdata.append((char*)buf, size*nmemb);
-    return size*nmemb;
-}
+
+
 
 int fetchmail() {
     CURL *curl;
@@ -95,64 +93,109 @@ int fetchmail() {
         curl_easy_setopt(curl, CURLOPT_PASSWORD, mail_password);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+       // curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Inbox::write_data);
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
 
-        curl_easy_setopt(curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX");
-        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "UID FETCH 1 BODY[HEADER.FIELDS (To)]");
+   //     curl_easy_setopt(curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX/;UID=5/;SECTION=TEXT");
+        curl_easy_setopt(curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX?NEW"); //_url + opta /optb
+        //curl_easy_setopt(curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX");
+
 
         res = curl_easy_perform(curl);
 
-        if(res != CURLE_OK)
-            fprintf(stderr, "curl_easy_perform() failed: %s\n",
-
-        curl_easy_strerror(res));        
-        curl_easy_cleanup(curl);
-    }
-
-    std::ofstream outfile("fetched.txt", std::ios_base::app);
+        if(res != CURLE_OK){
+            fprintf(stderr, "curl_easy_perform() failed: %s\n",  curl_easy_strerror(res)); curl_easy_cleanup(curl);
+        }
+     std::ofstream outfile("fetched.txt", std::ios_base::app);
     outfile << fetchdata;
     outfile.close();
 
+    }
+
+
     return (int)res;
 }
+ 
+
+
+
+
+
+//
+//
+//int fetchmail() {
+//    CURL *curl;
+//    CURLcode res = CURLE_OK;
+//
+//    curl = curl_easy_init();
+//    if(curl) {
+//        curl_easy_setopt(curl, CURLOPT_USERNAME, mail_login);
+//        curl_easy_setopt(curl, CURLOPT_PASSWORD, mail_password);
+//        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+//        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+//        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, EmailReceiver::write_data);
+//        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+//
+//        curl_easy_setopt(curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX");
+//        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "UID FETCH 1 BODY[HEADER.FIELDS (To)]");
+//
+//        res = curl_easy_perform(curl);
+//
+//        if(res != CURLE_OK)
+//            fprintf(stderr, "curl_easy_perform() failed: %s\n",
+//
+//        curl_easy_strerror(res));        
+//        curl_easy_cleanup(curl);
+//    }
+//
+//    std::ofstream outfile("fetched.txt", std::ios_base::app);
+//    outfile << fetchdata;
+//    outfile.close();
+//
+//    return (int)res;
+//}
 
 void Mailtest(void){
-    
-Email e;
-	int curlError = 0;
-	// e.dump();
-
-	e.setTo(mail_destination);
-	e.setFrom("mail.raspberry.smtp@gmail.com");
-	e.setSubject("hello world");
-	e.setCc("");
-	e.setBody("My test email from my app");
-
-	e.setSMTP_host("smtps://smtp.gmail.com:465");
-	e.setSMTP_username(mail_login);
-	e.setSMTP_password(mail_password);
-
-	e.constructEmail();
-	e.dump();
-
-	curlError = e.send();
-
-	if (curlError){
-		std::cout << "Error sending email!" << std::endl;
-	}
-
-	else{
-		std::cout << "Email sent successfully!" << std::endl;
-	}
+//    
+//Email e;
+//	int curlError = 0;
+//	// e.dump();
+//
+//	e.setTo(mail_destination);
+//	e.setFrom("mail.raspberry.smtp@gmail.com");
+//	e.setSubject("hello world");
+//	e.setCc("");
+//	e.setBody("My test email from my app");
+//
+//	e.setSMTP_host("smtps://smtp.gmail.com:465");
+//	e.setSMTP_username(mail_login);
+//	e.setSMTP_password(mail_password);
+//
+//	e.constructEmail();
+//	e.dump();
+//
+//	curlError = e.send();
+//
+//	if (curlError){
+//		std::cout << "Error sending email!" << std::endl;
+//	}
+//
+//	else{
+//		std::cout << "Email sent successfully!" << std::endl;
+//	}
 }
 
 
 
 int main ( int argc, char * argv[] )
 {
-    fetchmail();
+  // fetchmail();
    //// Mailtest();
+    
+    Inbox inbox(mail_login, mail_password, "imaps://imap.gmail.com:993/INBOX");
+    inbox.GetMailNumber();
+    std::cout<<"....#############################..\n"<<std::endl;
+    inbox.FetchMail();
     
     
 SqlWrapper MySqlConnector;
