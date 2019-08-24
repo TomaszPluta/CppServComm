@@ -100,9 +100,10 @@ int GetMailNumber() {
  
 
 
-int FetchMail() {
-       curl_easy_setopt(_curl, CURLOPT_VERBOSE, 1L);
-       curl_easy_setopt(_curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX/;UID=5/;SECTION=TEXT"); //_url + opta /optb + mail nb as arg
+int FetchMail(int id) {
+       curl_easy_setopt(_curl, CURLOPT_VERBOSE, 0L);
+       
+       curl_easy_setopt(_curl, CURLOPT_URL, std::string("imaps://imap.gmail.com:993/INBOX/;UID="+std::to_string(id)+"/;SECTION=TEXT").c_str()); //_url + opta /optb + mail nb as arg
 
         CURLcode res = curl_easy_perform(_curl);
         std::cout << readBuffer << std::endl;

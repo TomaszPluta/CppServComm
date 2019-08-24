@@ -189,14 +189,13 @@ void Mailtest(void){
 
 int main ( int argc, char * argv[] )
 {
-  // fetchmail();
+  // 5();
    //// Mailtest();
     
     Inbox inbox(mail_login, mail_password, "imaps://imap.gmail.com:993/INBOX");
     inbox.GetMailNumber();
     std::cout<<"....#############################..\n"<<std::endl;
-    inbox.FetchMail();
-    
+    inbox.FetchMail(5);
     
 SqlWrapper MySqlConnector;
 
