@@ -11,6 +11,7 @@
 #include <cassert>
 #include <utility>
 #include <mysql.h>
+#include <stdexcept>
 
 #include <iostream>
 #include <memory>
@@ -189,13 +190,12 @@ void Mailtest(void){
 
 int main ( int argc, char * argv[] )
 {
-  // 5();
-   //// Mailtest();
-    
-    Inbox inbox(mail_login, mail_password, "imaps://imap.gmail.com:993/INBOX");
-    inbox.GetMailNumber();
-    std::cout<<"....#############################..\n"<<std::endl;
-    inbox.FetchMail(5);
+ try{
+        Inbox inbox(mail_login, mail_password, "imaps://imap.gmail.com:993/INBOX");
+        inbox.GetUnreadIds();
+  } catch (std::runtime_error &e){
+     std::cout<<e.what()<<std::endl;
+  }
     
 SqlWrapper MySqlConnector;
 
