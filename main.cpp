@@ -192,7 +192,7 @@ int main ( int argc, char * argv[] )
 {
  try{
         Inbox inbox(mail_login, mail_password, "imaps://imap.gmail.com:993/INBOX");
-        inbox.GetUnreadIds();
+        std::cout<<inbox.GetUnreadEmails();
   } catch (std::runtime_error &e){
      std::cout<<e.what()<<std::endl;
   }

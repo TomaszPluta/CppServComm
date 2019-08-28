@@ -50,8 +50,11 @@ private:
 
 
 class EmailMsg {
-    std::string header;
-    std::string body;
+    std::string _header;
+    std::string _body;
+public:
+    EmailMsg(std::string email) : _body(email){};
+
 };
 
 
@@ -72,35 +75,26 @@ private:
 
 
 
-    int FetchMail(int id)  {
+    std::string FetchMail(int id)  {
         curl_easy_setopt(_curl, CURLOPT_URL, std::string(_url+"/;UID="+std::to_string(id)+"/;SECTION=TEXT").c_str());
         CURLcode res = curl_easy_perform(_curl);
-        std::cout << readBuffer << std::endl;
         if(res != CURLE_OK) {
             throw std::runtime_error("unable to fetch e-mail (given id: "+std::to_string(id)+")");
         }
-        return (int)res;
+        return readBuffer;
     }
     
-
-public:
-
-
-    std::vector<int> GetUnreadIds() {
+     std::vector<int> GetUnreadIds() {
         curl_easy_setopt(_curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX?UNSEEN");
         CURLcode res = curl_easy_perform(_curl);
         if(res != CURLE_OK) {
             throw std::runtime_error("unable to retrieve the number of unread emails");
         }
         
-      std::cout << readBuffer << std::endl; 
-      
        if (size_t pos = readBuffer.find("* SEARCH") != std::string::npos){
            readBuffer.erase(0, std::string("* SEARCH").length());
        }
       
-  std::cout << readBuffer << std::endl; 
-       
        std::stringstream ss(readBuffer);
        std::string id;
        std::vector<int> ids;
@@ -110,7 +104,9 @@ public:
 
        return ids;
     }
-    
+
+public:
+
     
     
     Inbox( std::string user,  std::string pwd, std::string inboxUrl) : _user(user), _pwd(pwd), _url(inboxUrl) {
@@ -129,11 +125,14 @@ public:
     }
 
 
-    std::vector<EmailMsg> GetUnreadEmail(){
+
+   
+    
+    std::vector<EmailMsg> GetUnreadEmails(){
         std::vector<EmailMsg> unreads;
-//        while ((id = inbox.GetUnreadId()) !=  ){
-//           unreads.push_back(inbox.FetchMail(id));
-//        }
+        for (auto i : GetUnreadIds()){
+            unreads.push_back(FetchMail(i));
+        }
         return unreads;
     }
     
