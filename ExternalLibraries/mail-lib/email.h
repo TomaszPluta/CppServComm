@@ -54,9 +54,23 @@ class EmailMsg {
     std::string _body;
 public:
     EmailMsg(std::string email) : _body(email){};
-
+    friend std::ostream & operator<<(std::ostream &os, const EmailMsg &email) ;
 };
 
+
+
+inline std::ostream& operator<<(std::ostream& os, const EmailMsg& email) {
+    os<< email._body;
+    return os;
+}
+
+
+inline std::ostream& operator<<(std::ostream& os, std::vector<EmailMsg> ev) {
+    for (const auto & i : ev){
+        os<< i;
+    }
+    return os;
+}
 
 
 class Inbox
