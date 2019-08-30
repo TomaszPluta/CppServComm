@@ -89,14 +89,6 @@ private:
 
 
 
-    std::string FetchMail(int id)  {
-        curl_easy_setopt(_curl, CURLOPT_URL, std::string(_url+"/;UID="+std::to_string(id)+"/;SECTION=TEXT").c_str());
-        CURLcode res = curl_easy_perform(_curl);
-        if(res != CURLE_OK) {
-            throw std::runtime_error("unable to fetch e-mail (given id: "+std::to_string(id)+")");
-        }
-        return readBuffer;
-    }
     
      std::vector<int> GetUnreadIds() {
         curl_easy_setopt(_curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX?UNSEEN");
@@ -121,6 +113,16 @@ private:
 
 public:
 
+    std::string FetchMail(int id)  {
+        //curl_easy_setopt(_curl, CURLOPT_URL, std::string(_url+"/;UID="+std::to_string(id)+"/;SECTION=TEXT").c_str());
+       curl_easy_setopt(_curl, CURLOPT_URL, std::string(_url+"/;UID="+std::to_string(id)+"/;SECTION=HEADER.FIELDS%20(DATE%20FROM%20SUBJECT)").c_str());
+      //curl_easy_setopt(_curl, CURLOPT_URL, std::string(_url+"/;UID="+std::to_string(id)+"/;SECTION=HEADER").c_str());
+        CURLcode res = curl_easy_perform(_curl);
+        if(res != CURLE_OK) {
+            throw std::runtime_error("unable to fetch e-mail (given id: "+std::to_string(id)+")");
+        }
+        return readBuffer;
+    }
     
     
     Inbox( std::string user,  std::string pwd, std::string inboxUrl) : _user(user), _pwd(pwd), _url(inboxUrl) {
