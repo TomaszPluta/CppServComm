@@ -49,11 +49,26 @@ private:
 };
 
 
+class Header {
+    public:
+    std::string date;
+    std::string from;
+    std::string subject;
+    
+    Header(std::string head){
+        date = head;
+        from = head;
+        subject = head;
+    }
+    
+};
+
+
 class EmailMsg {
-    std::string _header;
+    Header _header;
     std::string _body;
 public:
-    EmailMsg(std::string email) : _body(email){};
+    EmailMsg(std::string header, std::string body) : _header(header), _body(body){};
     friend std::ostream & operator<<(std::ostream &os, const EmailMsg &email) ;
 };
 
@@ -61,6 +76,7 @@ public:
 
 inline std::ostream& operator<<(std::ostream& os, const EmailMsg& email) {
     os<< email._body;
+    
     return os;
 }
 
@@ -113,14 +129,30 @@ private:
 
 public:
 
-    std::string FetchMail(int id)  {
-        curl_easy_setopt(_curl, CURLOPT_URL, std::string(_url+"/;UID="+std::to_string(id)+"/;SECTION=1").c_str());
-     //  curl_easy_setopt(_curl, CURLOPT_URL, std::string(_url+"/;UID="+std::to_string(id)+"/;SECTION=HEADER.FIELDS%20(DATE%20FROM%20SUBJECT)").c_str());
+    std::string FetchMailHeader(int id)  {
+        curl_easy_setopt(_curl, CURLOPT_URL, std::string(_url+"/;UID="+std::to_string(id)+"/;SECTION=HEADER.FIELDS%20(DATE%20FROM%20SUBJECT)").c_str());
         CURLcode res = curl_easy_perform(_curl);
         if(res != CURLE_OK) {
             throw std::runtime_error("unable to fetch e-mail (given id: "+std::to_string(id)+")");
         }
         return readBuffer;
+    }
+    
+    std::string FetchMailText(int id)  {
+        curl_easy_setopt(_curl, CURLOPT_URL, std::string(_url+"/;UID="+std::to_string(id)+"/;SECTION=1").c_str());
+        CURLcode res = curl_easy_perform(_curl);
+        if(res != CURLE_OK) {
+            throw std::runtime_error("unable to fetch e-mail (given id: "+std::to_string(id)+")");
+        }
+        return readBuffer;
+    }
+    
+
+
+
+    EmailMsg FetchMail(int id)  {
+      EmailMsg email( FetchMailHeader(id), FetchMailText(id));
+        return email;
     }
     
     
