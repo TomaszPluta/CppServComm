@@ -6,10 +6,14 @@
 #include <string>
 #include <stdexcept>
 #include <sstream>
+#include <clocale>
 
 #include "/home/tomek/credraspbmail.crd"
 
 #define LINUX_H
+
+//
+//std::locale::global(std::locale(""));   
 
 class EmailSender
 {
@@ -50,18 +54,36 @@ private:
 
 
 class Header {
+
+   static  constexpr int fromPos = 0;
+   static  constexpr int datePos = 1;
+   static  constexpr int subjectPos = 2;
     public:
-    std::string date;
+    std::string recDate;
     std::string from;
     std::string subject;
     
     Header(std::string head){
-        date = head;
-        from = head;
-        subject = head;
+        std::stringstream ss (head); 
+        std::string tmp;
+        std::vector<std::string>  tokens;
+         while(getline(ss, tmp)){
+             tokens.push_back(tmp);
+         }
+        from = tokens[fromPos];
+        recDate = tokens[datePos];
+        subject = tokens[subjectPos];
     }
-    
+    friend std::ostream & operator <<(std::ostream& os, const Header &header);
 };
+
+
+inline std::ostream & operator <<(std::ostream& os, const Header &header){ //move to cpp, not inline
+    os<<header.recDate<<std::endl; 
+    os<<header.from<<std::endl;
+    os<<header.subject<<std::endl;
+    return os;
+}
 
 
 class EmailMsg {
@@ -75,8 +97,8 @@ public:
 
 
 inline std::ostream& operator<<(std::ostream& os, const EmailMsg& email) {
+     os<< email._header;
     os<< email._body;
-    
     return os;
 }
 
@@ -89,6 +111,7 @@ inline std::ostream& operator<<(std::ostream& os, std::vector<EmailMsg> ev) {
 }
 
 
+ 
 class Inbox
 {
 private:
@@ -99,6 +122,7 @@ private:
     std::string readBuffer;
 
     static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp) {
+        ((std::string*)userp)->clear();
         ((std::string*)userp)->append((char*)contents, size * nmemb);
         return size * nmemb;
     }
