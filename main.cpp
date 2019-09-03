@@ -10,13 +10,14 @@
 #include <ctime> 
 #include <cassert>
 #include <utility>
-#include <mysql.h>
+#include <mysql/mysql.h>
 #include <stdexcept>
 
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
+#include <utility>
 #include "queue"
 
 #include "SqttClientItf.h"
@@ -83,79 +84,6 @@ std::string fetchdata;
 
 
 
-
-int fetchmail() {
-    CURL *curl;
-    CURLcode res = CURLE_OK;
-
-    curl = curl_easy_init();
-    if(curl) {
-        curl_easy_setopt(curl, CURLOPT_USERNAME, mail_login);
-        curl_easy_setopt(curl, CURLOPT_PASSWORD, mail_password);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-       // curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Inbox::write_data);
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
-
-   //     curl_easy_setopt(curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX/;UID=5/;SECTION=TEXT");
-        curl_easy_setopt(curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX?NEW"); //_url + opta /optb
-        //curl_easy_setopt(curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX");
-
-
-        res = curl_easy_perform(curl);
-
-        if(res != CURLE_OK){
-            fprintf(stderr, "curl_easy_perform() failed: %s\n",  curl_easy_strerror(res)); curl_easy_cleanup(curl);
-        }
-     std::ofstream outfile("fetched.txt", std::ios_base::app);
-    outfile << fetchdata;
-    outfile.close();
-
-    }
-
-
-    return (int)res;
-}
- 
-
-
-
-
-
-//
-//
-//int fetchmail() {
-//    CURL *curl;
-//    CURLcode res = CURLE_OK;
-//
-//    curl = curl_easy_init();
-//    if(curl) {
-//        curl_easy_setopt(curl, CURLOPT_USERNAME, mail_login);
-//        curl_easy_setopt(curl, CURLOPT_PASSWORD, mail_password);
-//        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-//        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-//        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, EmailReceiver::write_data);
-//        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-//
-//        curl_easy_setopt(curl, CURLOPT_URL, "imaps://imap.gmail.com:993/INBOX");
-//        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "UID FETCH 1 BODY[HEADER.FIELDS (To)]");
-//
-//        res = curl_easy_perform(curl);
-//
-//        if(res != CURLE_OK)
-//            fprintf(stderr, "curl_easy_perform() failed: %s\n",
-//
-//        curl_easy_strerror(res));        
-//        curl_easy_cleanup(curl);
-//    }
-//
-//    std::ofstream outfile("fetched.txt", std::ios_base::app);
-//    outfile << fetchdata;
-//    outfile.close();
-//
-//    return (int)res;
-//}
-
 void Mailtest(void){
 //    
 //Email e;
@@ -187,14 +115,14 @@ void Mailtest(void){
 }
 
 
-
 int main ( int argc, char * argv[] )
 {
+    
  try{
         Inbox inbox(mail_login, mail_password, "imaps://imap.gmail.com:993/INBOX");
         std::cout<<inbox.GetUnreadEmails();
-       EmailMsg email = inbox.FetchMail(5);
-        std::cout <<email;
+      // EmailMsg email = inbox.FetchMail(5); //debug
+      //  std::cout <<email;
   } catch (std::runtime_error &e){
      std::cout<<e.what()<<std::endl;
   }
