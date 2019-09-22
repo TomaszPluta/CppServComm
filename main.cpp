@@ -27,7 +27,7 @@
 
 #include "SharedQueue.h"
 
-#include "email.h"
+#include "mailbox.h"
 #include "/home/tomek/credraspbmail.crd"
 
 constexpr int ServPort = 1886;
@@ -83,27 +83,23 @@ std::string GetTimeNow (){
 std::string fetchdata;
 
 
-
-void Mailtest(void){
-//    
-//Email e;
-//	int curlError = 0;
-//	// e.dump();
 //
-//	e.setTo(mail_destination);
-//	e.setFrom("mail.raspberry.smtp@gmail.com");
-//	e.setSubject("hello world");
+//void Mailtest(void){
+//    
+//    EmailSender e(mail_login, mail_password, "smtps://smtp.gmail.com:465", "raspb");
+//	int curlError = 0;
+//	e.setSubject("odp");
 //	e.setCc("");
-//	e.setBody("My test email from my app");
+//	e.setBody("no jak testuje");
 //
 //	e.setSMTP_host("smtps://smtp.gmail.com:465");
 //	e.setSMTP_username(mail_login);
 //	e.setSMTP_password(mail_password);
 //
 //	e.constructEmail();
-//	e.dump();
 //
-//	curlError = e.send();
+//    
+//	curlError = e.send(mail_destination);
 //
 //	if (curlError){
 //		std::cout << "Error sending email!" << std::endl;
@@ -112,17 +108,23 @@ void Mailtest(void){
 //	else{
 //		std::cout << "Email sent successfully!" << std::endl;
 //	}
-}
+//}
 
 
 int main ( int argc, char * argv[] )
 {
+  //  Mailtest();
+    
     
  try{
-        Inbox inbox(mail_login, mail_password, "imaps://imap.gmail.com:993/INBOX");
-        std::cout<<inbox.GetUnreadEmails();
-      // EmailMsg email = inbox.FetchMail(5); //debug
-      //  std::cout <<email;
+         EmailMsg email;
+              MailBox mailbox(mail_login, mail_password, "imaps://imap.gmail.com:993/INBOX", "smtps://smtp.gmail.com:465");
+           mailbox.Send(mail_destination, "TEST subjecT", "Here goes content!");
+           
+     std::cout<<mailbox.GetUnreadEmails();
+
+mailbox.GetUnreadEmails();
+
   } catch (std::runtime_error &e){
      std::cout<<e.what()<<std::endl;
   }
